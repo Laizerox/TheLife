@@ -36,6 +36,7 @@ class CommandHandler {
         void about(std::string arg);
         void threads(std::string arg);
         void ConfigList(std::string arg);
+        void LanguageList(std::string arg);
         void GetConfig(std::string arg);
         void UnitEditName(std::string arg);
         void UnitEditAge(std::string arg);

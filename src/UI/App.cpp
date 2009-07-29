@@ -39,6 +39,12 @@ TheLife::Application* TheLife::Application::getInstance()
 
 void TheLife::LoadLife() {
 
+    
+    struct timespec start;
+    struct timespec end;
+    struct timespec diff;
+    
+    clock_gettime(CLOCK_MONOTONIC, &start);
     LogHandler::WriteLog(Language::Get(LOG_LOAD_BEGIN));
     
     pthread_t main, status;
@@ -92,6 +98,9 @@ void TheLife::LoadLife() {
     pthread_join(main, NULL);    
     
     LogHandler::WriteLog(Language::Get(LOG_LOAD_END));
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    diff = diff_timespec(start, end);
+    Debug("Load took %lld milliseconds\n", millisec_elapsed(diff));
 }
 
 void TheLife::UnloadLife() {
@@ -238,32 +247,36 @@ void TheLife::Error(std::string error, ...) {
     LogHandler::WriteError(error);
 }
 
-std::vector<std::string> TheLife::SeparateString(std::string c) {
+std::vector<std::string> TheLife::Explode(std::string delimiter, std::string str) {
 
     std::vector<std::string> vars;
-
-    for (std::string::size_type a = 0; a < c.length(); a++) {
-
-        // Skip empty spaces before a command
-        while (a < c.length() && isspace(c[a]))
-        ++a;
+    char tmp;
+    int y = 0;
+    
+    for(std::string::size_type a = 0; a < str.size(); ++a) {
 
         std::string word;
- 
-        // Insert command into string 'word'
-        while (a < c.length() && !isspace(c[a])) {
-            word.push_back(c[a]);
+        
+        while(a < str.size()) {
+            tmp = str.at(a);
+    
+            if(CharCheck(delimiter, (const char *)&tmp))
+                y = a;
+
+            if(!CharCheck(delimiter, (const char *)&tmp))
+                word.push_back(tmp);
+
+            if(y >= a && a != 0 || str.size() == a+1) {
+                vars.push_back(word);
+                word.clear();
+            }
             ++a;
         }
-
-        // Add 'word' to vars
-        vars.push_back(word);
     }
-
     return vars;
 }
 
-void TheLife::SigHandler(int sig)  {
+void TheLife::SigHandler(int sig) {
 
     Interface::UI *ui = Interface::UI::getInstance();
     
@@ -273,4 +286,81 @@ void TheLife::SigHandler(int sig)  {
     else if(sig == SIG_STATUS) {
         ui->StatusUpdate();
     }
+}
+
+struct timespec TheLife::diff_timespec(struct timespec start, struct timespec end) {
+    
+    struct timespec result;
+
+    if (end.tv_nsec < start.tv_nsec) { // peform carry like in normal subtraction
+        //                123456789
+        result.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+        result.tv_sec = end.tv_sec - 1 - start.tv_sec;
+    }
+    else {
+        result.tv_nsec = end.tv_nsec - start.tv_nsec;
+        result.tv_sec = end.tv_sec - start.tv_sec;
+    }
+
+    return result;
+}
+
+long long TheLife::millisec_elapsed(struct timespec diff) {
+    //                                123                     123456
+    return ((long long)diff.tv_sec * 1000) + (diff.tv_nsec / 1000000);
+}
+
+std::vector<std::string> TheLife::DirExtension(std::string dir, std::string rexp) {
+    
+    struct dirent *items;
+    std::vector<std::string> iName;
+
+    if(DIR *folder = opendir(dir.c_str()))
+    {
+        while(items = readdir (folder)) {
+            if(strlen(items->d_name) > rexp.size()) {
+                if(CharCheck(rexp, items->d_name)) {
+                    iName.push_back(items->d_name);
+                }
+            }
+        }
+        closedir(folder);
+        return iName;
+    }
+    else
+        Error("Error while opening folder %s\n", dir.c_str());
+}
+
+void TheLife::CharStr(std::string ch, std::string& str) {
+
+    for(int i = 0; i < str.size(); ++i) {
+        if(!strncmp((const char *)&str[i], ch.c_str(), ch.size())) {
+            str.erase(i, ch.size());
+        }
+    }
+}
+
+bool TheLife::CharCheck(std::string ch, const char *str, int n) {
+
+    int a = 0;
+    
+    if(n > a) {
+        while(n != a){
+            for(int i = 0; i < strlen(str); ++i) {
+                if(!strncmp((strlen(str) > 1) ? &str[i] : str, ch.c_str(), ch.size())) {
+                    ++a;
+                }
+            }
+        }
+    }
+    else {
+        for(int i = 0; i < strlen(str); ++i) {
+            //std::cout << str[i] << " " << str << " " << ch << " " << ch.size() << " " << str.size() << std::endl;
+            if(!strncmp((strlen(str) > 1) ? &str[i] : str, ch.c_str(), ch.size())) {
+                return TRUE;
+            }
+        }
+    }
+
+    return (n > a) ? ((a >= n) ? FALSE : TRUE) : FALSE;
 }

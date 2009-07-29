@@ -25,8 +25,14 @@ namespace TheLife {
         int KeyHandle(int key, int keycolor);
         void Debug(std::string debug, ...);
         void Error(std::string error, ...);
-        std::vector<std::string> SeparateString(std::string c);
+        std::vector<std::string> Explode(std::string delimiter, std::string str);
+        std::string Implode(std::string limiter, std::vector<std::string> vec);
         void SigHandler(int sig);
+        long long millisec_elapsed(struct timespec diff);
+        struct timespec diff_timespec(struct timespec start, struct timespec end);
+        std::vector<std::string> DirExtension(std::string dir, std::string rexp);
+        void CharStr(std::string ch, std::string& str);
+        bool CharCheck(std::string ch, const char *str, int n = 0);
 
         class Application {
 

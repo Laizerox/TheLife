@@ -95,7 +95,7 @@ void config::LoadConf(std::string file, config *conf)  {
             int quotes = 0;
             int vars_size = 0;
 
-            vars = TheLife::SeparateString(c);
+            vars = TheLife::Explode(" ", c);
 
             for(int j = 0; j < vars.size(); ++j) {
                 for(int x = 0; x < vars[j].size(); ++x) {
@@ -122,11 +122,7 @@ void config::LoadConf(std::string file, config *conf)  {
                         if(vars[j].at(0) == co.at(1))
                             continue;
                         else {
-                            for(int x = 0; x < vars[j].size(); x++) {
-                                if(vars[j].at(x) == co.at(2)) {
-                                    vars[j] = vars[j].erase(x,1);
-                                }
-                            }
+                            TheLife::CharStr("\"", vars[j]);
                             this->data[i].push_back(vars[j]);
                         }
                     }
@@ -206,7 +202,7 @@ bool config::WriteToConfig(std::string file, std::string variable) {
         file = "data/life.config";
 	
     std::vector<std::string> vars;
-    vars = TheLife::SeparateString(variable);
+    vars = TheLife::Explode(" ", variable);
 
     std::string confLine;
 

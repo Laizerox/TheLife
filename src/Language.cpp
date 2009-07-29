@@ -127,11 +127,42 @@ int Language::LanguageHeader::HeaderLine(std::string look) {
 }
 
 void Language::LanguageHeader::LoadHeader() {
+
+    std::string dir = "./language/";
+    std::vector<std::string> list = TheLife::DirExtension(dir, ".lng");
+    std::string exp = "%";
+
+    for(int i = 0; i < list.size(); ++i) {
+        std::string temp = dir + list[i];
+        std::fstream file (temp.c_str(), std::ios::in);
+
+        if(!file)
+        {
+            TheLife::Error("Error loading %s file", list[i].c_str());
+            return;
+        }
+
+        std::string line;
+        
+        while(getline(file, line))
+        {
+            if(line.empty())
+                continue;
+            else if(line.at(0) == exp.at(0))
+            {
+                std::vector<std::string> info = TheLife::Explode(" ", line);
+                TheLife::Debug("Loading %s from file %s\n", info[1].c_str(), list[i].c_str());
+                this->data.push_back(std::vector<std::string>());
+                data[i].push_back(info[1]);
+            }
+        }
+        
+    }
 }
 
 void Language::Load(std::string file) {
     
-     setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "");
     
     // Open language file
     std::fstream LNG (file.c_str(), std::ios::in);
@@ -149,11 +180,7 @@ void Language::Load(std::string file) {
     while(getline(LNG, c))
     {
         // Language file can be commented with #
-        if(c.empty())
-            continue;
-        else if(c.at(0) == co.at(0))
-            continue;
-        else if(c.at(0) == co.at(3))
+        if(c.empty() || TheLife::CharCheck("#", c.c_str()) || TheLife::CharCheck("%", c.c_str()))
             continue;
         else
         {
@@ -161,7 +188,7 @@ void Language::Load(std::string file) {
             int quotes = 0;
             int vars_size = 0;
 
-            vars = TheLife::SeparateString(c);
+            vars = TheLife::Explode(" ", c);
 
             for(int j = 0; j < vars.size(); ++j) {
                 for(int x = 0; x < vars[j].size(); ++x) {
@@ -169,7 +196,7 @@ void Language::Load(std::string file) {
                         ++quotes;
                     }
                 }
-
+                
                 if(quotes == 2) {
                     vars_size = j+1;
                     break;

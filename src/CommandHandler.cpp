@@ -58,6 +58,7 @@ CommandTable * CommandHandler::commands()
         { "exit",               &CommandHandler::exit,        NULL   },
         { "threads" ,           &CommandHandler::threads,     NULL   },
         { "confs" ,             &CommandHandler::ConfigList,  NULL   },
+        { "langs" ,             &CommandHandler::LanguageList,  NULL   },
         { "editunit" ,          NULL,                         pUnit  },
         { "addconf" ,           NULL,                         pConf  },
         { "hide" ,              &CommandHandler::hide,        NULL   },
@@ -79,7 +80,7 @@ void const CommandHandler::LookupCommand(CommandTable *table, std::string cmd)  
     // Check that cmd is not empty otherwise we will crash
     if(!cmd.empty()) {
 
-        lines = TheLife::SeparateString(cmd);
+        lines = TheLife::Explode(" ", cmd);
 
         for(int i = 1; i < lines.size(); ++i)
         {
@@ -171,6 +172,18 @@ void CommandHandler::ConfigList(std::string arg) {
         Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), conf->GetData(i).c_str());
         for(int j = 1; j < conf->GetDataSize(i); ++j) {
             Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(),conf->GetData(i,j).c_str(), i, j, (j == conf->GetDataSize(i)-1) ? "\n\n" : "\n");
+        }
+    }
+}
+
+void CommandHandler::LanguageList(std::string arg) {
+
+    Language::LanguageHeader *Lng = Language::LanguageHeader::getInstance();
+
+    for(int i = 0; i < Lng->HeaderDataSize(); ++i) {
+        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), Lng->ReturnHeader(i).c_str());
+        for(int j = 1; j < Lng->HeaderDataSize(i); ++j) {
+            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(),Lng->ReturnHeader(i,j).c_str(), i, j, (j == Lng->HeaderDataSize(i)-1) ? "\n\n" : "\n");
         }
     }
 }

@@ -103,6 +103,13 @@ namespace Language {
             LanguageHeader() {}
 
         private:
+            /* LanguageHeader Data Design
+             0: Language STR
+             1: Localization
+             2: Author
+             3: Version
+             4: Filename (should be Language STR + .lng extension) NYI
+            */
             std::vector<std::vector <std::string> > data;
 
         public:
@@ -113,7 +120,7 @@ namespace Language {
             virtual std::string ReturnHeader(int i, int j = 0)  { return data[i][j]; }
             virtual std::string ReadHeadInfo(std::string look, int pos = 1);
             virtual int HeaderDataSize(int slot = -1) { return (slot > -1) ? data[slot].size() : data.size(); }
-            virtual int HeaderLine(std::string look);
+            virtual int HeaderLine(std::string look);            
 	};
 };
 

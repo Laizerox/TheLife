@@ -23,13 +23,15 @@
 #include "UI/Interface.h"
 
 int main() {
-
+    
     TheLife::Application *App = TheLife::Application::getInstance();
+    Language::LanguageHeader *Lng = Language::LanguageHeader::getInstance();
     config *conf = config::getInstance();
     
-    conf->LoadConf("data/life.config", conf);
+    //Language::Load("finnish.lng");
+    Lng->LoadHeader();    
     
-    Language::Load("other_test.lng");
+    conf->LoadConf("data/life.config", conf);
     
     Interface::LoadMenu();
     
