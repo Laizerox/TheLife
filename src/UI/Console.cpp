@@ -16,45 +16,43 @@
  * 
  */
 
-#include "../Share.h"
+#include <cstring>
+
 #include "Interface.h"
 
 void Interface::ConsoleInit(std::string text) {
 
     int y, x;
-    Interface::UI *ui = Interface::UI::getInstance();
 
     // Initialization
     getmaxyx( stdscr, y, x );
 
-    ui->SetY(y, WCON);
-    ui->SetX(x - CONS_WIDTH, WCON);
-    ui->SetWindow(newwin( ui->GetY(WCON), ui->GetX(WCON), 0, 0 ), WCON);
-    ui->SetConsole(derwin( ui->GetWindow(WCON), ui->GetY(WCON) - 6 , ui->GetX(WCON) - 4, 1, 2 ), WCON);
-    idlok( ui->GetConsole(WCON, 0), TRUE );
-    scrollok( ui->GetConsole(WCON, 0), TRUE );
+    sUI->SetY(y, WCON);
+    sUI->SetX(x - CONS_WIDTH, WCON);
+    sUI->SetWindow(newwin( sUI->GetY(WCON), sUI->GetX(WCON), 0, 0 ), WCON);
+    sUI->SetConsole(derwin( sUI->GetWindow(WCON), sUI->GetY(WCON) - 6 , sUI->GetX(WCON) - 4, 1, 2 ), WCON);
+    idlok( sUI->GetConsole(WCON, 0), TRUE );
+    scrollok( sUI->GetConsole(WCON, 0), TRUE );
 
-    ui->SetConsole(derwin( ui->GetWindow(WCON), 3, ui->GetX(WCON) - 4, ui->GetY(WCON) - 4, 2 ), WCON);
+    sUI->SetConsole(derwin( sUI->GetWindow(WCON), 3, sUI->GetX(WCON) - 4, sUI->GetY(WCON) - 4, 2 ), WCON);
 
-    ui->lwin[WCON].field_buf[0] = 0x00;
-    ui->lwin[WCON].field_ptr = 0x00;
-    ui->lwin[WCON].field_length = 0x00;
+    sUI->lwin[WCON].field_buf[0] = 0x00;
+    sUI->lwin[WCON].field_ptr = 0x00;
+    sUI->lwin[WCON].field_length = 0x00;
 
     // Draw
-    getmaxyx( ui->GetWindow(WCON), y, x );
+    getmaxyx( sUI->GetWindow(WCON), y, x );
 
-    box( ui->GetWindow(WCON), 0, 0 );
+    box( sUI->GetWindow(WCON), 0, 0 );
     ConsoleTitle( text );
-    mvwhline( ui->GetWindow(WCON), y - 5, 1, 0, x - 2 );
+    mvwhline( sUI->GetWindow(WCON), y - 5, 1, 0, x - 2 );
 }
 
 void Interface::ConsoleTitle(std::string text) {
 
-    Interface::UI *ui = Interface::UI::getInstance();
-
-    wattron( ui->GetWindow(WCON), A_BOLD );
-    mvwaddnstr( ui->GetWindow(WCON), 0, 2, text.c_str(), ui->GetX(0) - 4 );
-    wattroff( ui->GetWindow(WCON), A_BOLD );
+    wattron( sUI->GetWindow(WCON), A_BOLD );
+    mvwaddnstr( sUI->GetWindow(WCON), 0, 2, text.c_str(), sUI->GetX(0) - 4 );
+    wattroff( sUI->GetWindow(WCON), A_BOLD );
 }
 
 void Interface::ConsoleBuffer(WINDOW *cons, char *buffer, int height, int width, int ptr) {
@@ -78,22 +76,20 @@ void Interface::ConsoleOutput(std::string text, ...) {
     char buf[2048];
     va_list ap;
 
-    Interface::UI *ui = Interface::UI::getInstance();
-
     va_start(ap, text.c_str());
     vsnprintf(buf, sizeof(buf) - 1, text.c_str(), ap);
     va_end(ap);
 
-    if (CSBUF <= (strlen(ui->lwin[WCON].buf) + strlen(buf))) {
-        strncpy(ui->lwin[WCON].buf, &ui->lwin[WCON].buf[strlen(buf)], CSBUF - 1);
-        ui->lwin[WCON].buf[strlen(buf)] = 0x00;
+    if (CSBUF <= (strlen(sUI->lwin[WCON].buf) + strlen(buf))) {
+        strncpy(sUI->lwin[WCON].buf, &sUI->lwin[WCON].buf[strlen(buf)], CSBUF - 1);
+        sUI->lwin[WCON].buf[strlen(buf)] = 0x00;
     }
-    strncat(ui->lwin[WCON].buf, buf, CSBUF - 1 - strlen(buf) - strlen(ui->lwin[WCON].buf));
-    waddstr(ui->GetConsole(WCON, 0), buf);
+    strncat(sUI->lwin[WCON].buf, buf, CSBUF - 1 - strlen(buf) - strlen(sUI->lwin[WCON].buf));
+    waddstr(sUI->GetConsole(WCON, 0), buf);
 
-    if(ui)
+    if(sUI)
     {
-        wrefresh(ui->GetConsole(WCON, 0));
+        wrefresh(sUI->GetConsole(WCON, 0));
     }
 }
 

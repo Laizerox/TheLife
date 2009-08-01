@@ -19,6 +19,17 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+#include <vector>
+#include <string>
+#include <ncursesw/ncurses.h>
+#include <ncursesw/panel.h>
+#include <ncursesw/menu.h>
+
+#include "../Singleton.h"
+
+#define sUI Interface::UI::getInstance()
+#define sMenu Interface::Menu::getInstance()
+
 #define CONS_WIDTH   20
 #define MENU_HEIGHT  15
 #define MENU_WIDTH   30
@@ -86,19 +97,15 @@ namespace Interface {
         void Unload();
         void Resize();
 
-        class UI {
-
-            protected:
-                static UI* Instance;
-                UI() {}
+        class UI : public Singleton<UI> {
 
             private:
                 PANEL *panel[PANS];
                 LIFE_PANEL lpan[PANS];
 
             public:
-                static UI* getInstance();
-
+                UI() {}
+                
                 LIFE_WINDOW lwin[PANS];
 
                 // Console handler
@@ -141,18 +148,15 @@ namespace Interface {
         void MenuLife();
         void MenuOptions();
         
-        class Menu {
-        
-            protected:
-                static Menu* Instance;
-                Menu() {}
+        class Menu : public Singleton<Menu> {
 
             private:
                 LIFE_MENU lmenu;
                 bool quit;
 
             public:
-                static Menu* getInstance();
+                Menu() {}
+                
                 ITEM    **ch;
                 
                 // -- Get functions --

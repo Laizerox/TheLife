@@ -19,20 +19,19 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
 
+#include "Singleton.h"
+
+#define sFileHandler FileHandler::LD_FILE::getInstance()
 
 #define LDV 0x01
 #define LDH 0x01
 
 namespace FileHandler {
 
-        class LD_FILE {
-
-            protected:
-                static LD_FILE*  Instance;
-                LD_FILE() {}
+        class LD_FILE : public Singleton<LD_FILE> {
 
             public:
-                static LD_FILE* getInstance();
+                LD_FILE() {}
                 int loaded_ldv;
                 int loaded_ldh;
                 bool first_load;

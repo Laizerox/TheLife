@@ -16,7 +16,10 @@
  * 
  */
 
-#include "Share.h"
+#include <cstdlib>
+#include <sstream>
+#include <cstring>
+
 #include "CommandHandler.h"
 #include "config.h"
 #include "Unit.h"
@@ -71,7 +74,6 @@ CommandTable * CommandHandler::commands()
 // This command looks for command from table and executes it if found.
 void const CommandHandler::LookupCommand(CommandTable *table, std::string cmd)  {
 
-    config *conf = config::getInstance();
     bool found = false;
     std::vector<std::string> lines;
     std::string arg;
@@ -134,16 +136,13 @@ void CommandHandler::help(std::string arg) {
 
 void CommandHandler::exit(std::string arg) {
 
-    TheLife::Application *App = TheLife::Application::getInstance();
-    App->SetActive(FALSE);
-    App->SetUnload(TRUE);
+    sTheLife->SetActive(FALSE);
+    sTheLife->SetUnload(TRUE);
     TheLife::Debug(Language::Get(DEBUG_CALL_EXIT).c_str());
 }
 
 void CommandHandler::about(std::string arg) {
-
-    config *conf = config::getInstance();
-    Thread::cThread *th = Thread::cThread::getInstance();
+    
     Interface::ConsoleOutput("=== About ===\n"
                      "This project is written by:\n"
                      "  * Laizerox\n\n"
@@ -153,64 +152,55 @@ void CommandHandler::about(std::string arg) {
                      "Version: %s\n"
                      "Confs loaded: %d\n"
                      "Threads created: %d\n"
-                     "=============\n\n", conf->GetVariable("version").c_str(), conf->GetDataSize(), th->ListThread());
+                     "=============\n\n", sConfig->GetVariable("version").c_str(), sConfig->GetDataSize(), sThread->ListThread());
 }
 
 void CommandHandler::threads(std::string arg) {
 
-    Thread::cThread *th = Thread::cThread::getInstance();
-
-    for(int i = 0; i < th->ListThread(); ++i)
-        Interface::ConsoleOutput(Language::Get(CMD_TH_POINTER).c_str(), i, th->GetThread(i));
+    for(int i = 0; i < sThread->ListThread(); ++i)
+        Interface::ConsoleOutput(Language::Get(CMD_TH_POINTER).c_str(), i, sThread->GetThread(i));
 }
 
 void CommandHandler::ConfigList(std::string arg) {
 
-    config *conf = config::getInstance();
-
-    for(int i = 0; i < conf->GetDataSize(); ++i) {
-        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), conf->GetData(i).c_str());
-        for(int j = 1; j < conf->GetDataSize(i); ++j) {
-            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(),conf->GetData(i,j).c_str(), i, j, (j == conf->GetDataSize(i)-1) ? "\n\n" : "\n");
+    for(int i = 0; i < sConfig->GetDataSize(); ++i) {
+        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), sConfig->GetData(i).c_str());
+        for(int j = 1; j < sConfig->GetDataSize(i); ++j) {
+            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(), sConfig->GetData(i,j).c_str(), i, j, (j == sConfig->GetDataSize(i)-1) ? "\n\n" : "\n");
         }
     }
 }
 
 void CommandHandler::LanguageList(std::string arg) {
 
-    Language::LanguageHeader *Lng = Language::LanguageHeader::getInstance();
-
-    for(int i = 0; i < Lng->HeaderDataSize(); ++i) {
-        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), Lng->ReturnHeader(i).c_str());
-        for(int j = 1; j < Lng->HeaderDataSize(i); ++j) {
-            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(),Lng->ReturnHeader(i,j).c_str(), i, j, (j == Lng->HeaderDataSize(i)-1) ? "\n\n" : "\n");
+    Interface::ConsoleOutput("HeaderDataSize() is %d\n", sLangHeader->HeaderDataSize());
+    for(int i = 0; i < sLangHeader->HeaderDataSize(); ++i) {
+        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), sLangHeader->ReturnHeader(i).c_str());
+        for(int j = 1; j < sLangHeader->HeaderDataSize(i); ++j) {
+            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(), sLangHeader->ReturnHeader(i,j).c_str(), i, j, (j == sLangHeader->HeaderDataSize(i)-1) ? "\n\n" : "\n");
         }
     }
 }
 
 void CommandHandler::hide(std::string arg) {
-
-    Interface::UI *ui = Interface::UI::getInstance();
     
     int pan;
     std::stringstream argstrm(arg);
 
     if (!(argstrm>>pan).fail())
-        ui->HidePanel(pan);
+        sUI->HidePanel(pan);
 }
 
 void CommandHandler::UnitEditName(std::string arg) {
 
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
+    Unit *u = sUnitStore->ReturnUnit(0);
 
     u->SetName(arg);
 }
 
 void CommandHandler::UnitEditAge(std::string arg) {
 
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
+    Unit *u = sUnitStore->ReturnUnit(0);
 
     int age;
     std::stringstream argstrm(arg);
@@ -221,8 +211,7 @@ void CommandHandler::UnitEditAge(std::string arg) {
 
 void CommandHandler::UnitEditSex(std::string arg) {
 
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
+    Unit *u = sUnitStore->ReturnUnit(0);
 
     int sex;
     std::stringstream argstrm(arg);
@@ -232,8 +221,7 @@ void CommandHandler::UnitEditSex(std::string arg) {
 }
 void CommandHandler::UnitEditOcc(std::string arg) {
 
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
+    Unit *u = sUnitStore->ReturnUnit(0);
 
     int occ;
     std::stringstream argstrm(arg);
@@ -244,11 +232,9 @@ void CommandHandler::UnitEditOcc(std::string arg) {
 
 void CommandHandler::GetConfig(std::string arg) {
 
-    config *conf = config::getInstance();
-
-    if(!conf->GetVariable(arg).empty()) {
-        for(int i = 1; i < conf->GetDataSize(conf->GetLine(arg)); ++i)
-            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_GET).c_str(), arg.c_str(), i, conf->GetVariable(arg,i).c_str());
+    if(!sConfig->GetVariable(arg).empty()) {
+        for(int i = 1; i < sConfig->GetDataSize(sConfig->GetLine(arg)); ++i)
+            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_GET).c_str(), arg.c_str(), i, sConfig->GetVariable(arg,i).c_str());
     }
     else
         TheLife::Error(Language::Get(ERROR_WRONG_CMD_CONFIG).c_str(), arg.c_str());
@@ -256,9 +242,7 @@ void CommandHandler::GetConfig(std::string arg) {
 
 void CommandHandler::ConfigAddConfig(std::string var) {
 
-    config *conf = config::getInstance();
-
-    std::string path = conf->GetVariable("ldpath");
+    std::string path = sConfig->GetVariable("ldpath");
 
     if(path.empty()) {
         path = ".";
@@ -268,14 +252,12 @@ void CommandHandler::ConfigAddConfig(std::string var) {
     file += "/";
     file += "life.config";
 
-    conf->WriteToConfig(file, var);
+    sConfig->WriteToConfig(file, var);
 }
 
 void CommandHandler::ConfigAddComment(std::string com) {
 
-    config *conf = config::getInstance();
-
-    std::string path = conf->GetVariable("ldpath");
+    std::string path = sConfig->GetVariable("ldpath");
 
     if(path.empty()) {
         path = ".";
@@ -285,13 +267,12 @@ void CommandHandler::ConfigAddComment(std::string com) {
     file += "/";
     file += "life.config";
 
-    conf->WriteToConfig(file, "# " + com);
+    sConfig->WriteToConfig(file, "# " + com);
 }
 
 // CommandProcess is processing command request
 void const CommandHandler::CommandProcess(char *buffer)  {
 
-    config *conf = config::getInstance();
     std::string output = buffer;
     std::string trigger = "/";
     std::string f;

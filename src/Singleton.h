@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2008 The Life
+ * Copyright (C) 2008 TheLife
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,31 @@
  * 
  */
 
-#include "Share.h"
-#include "Unit.h"
+#ifndef SINGLETON_H
+#define SINGLETON_H
 
-UnitStore* UnitStore::Instance = NULL;
-
-UnitStore* UnitStore::getInstance()
+template<class T>
+class Singleton
 {
-    if(Instance == NULL)  {
+    public:
+        static T* getInstance() {
+            if(instance == NULL) instance = new T();
+            return instance;
+         }
 
-        Instance = new UnitStore();
-    }
+        static void destroy() {
+            delete instance;
+            instance = NULL;
+        }
 
-    return Instance;
-}
+    protected:
+        static T* instance;
+        Singleton() {}
+        virtual ~Singleton() {}
+
+    private:
+        Singleton(const Singleton<T>&);
+};
+
+template<typename T> T* Singleton<T>::instance = NULL;
+#endif

@@ -19,6 +19,13 @@
 #ifndef UNIT_H
 #define UNIT_H
 
+#include <string>
+#include <vector>
+
+#include "Singleton.h"
+
+#define sUnitStore UnitStore::getInstance()
+
 enum SEX {
 
     NONE    = 0,
@@ -63,17 +70,14 @@ class Unit {
 
 };
 
-class UnitStore {
-
-    protected:
-        static UnitStore*  Instance;
-        UnitStore() {}
+class UnitStore : public Singleton<UnitStore> {
 
     private:
         std::vector<Unit *> StoredUnits;
 
     public:
-        static UnitStore* getInstance();
+        UnitStore() {}
+        
         void StoreUnit(Unit *u) { this->StoredUnits.push_back(u); }
         virtual Unit *ReturnUnit(int i) { return StoredUnits[i]; }
         int UnitSize() { return StoredUnits.size(); }

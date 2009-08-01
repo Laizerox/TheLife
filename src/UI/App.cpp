@@ -16,7 +16,12 @@
  * 
  */
 
-#include "../Share.h"
+#include <iostream>
+#include <csignal>
+#include <cstring>
+#include <dirent.h>
+
+#include "../SignalDef.h"
 #include "../CommandHandler.h"
 #include "../LogHandler.h"
 #include "../FileHandler.h"
@@ -24,18 +29,6 @@
 #include "../Language.h"
 #include "App.h"
 #include "Interface.h"
-
-TheLife::Application* TheLife::Application::Instance = NULL;
-
-TheLife::Application* TheLife::Application::getInstance()
-{
-    if(Instance == NULL)  {
-
-        Instance = new Application();
-    }
-
-    return Instance;
-}
 
 void TheLife::LoadLife() {
 
@@ -49,12 +42,9 @@ void TheLife::LoadLife() {
     
     pthread_t main, status;
 
-    Interface::UI *ui = Interface::UI::getInstance();
-    Thread::cThread *th = Thread::cThread::getInstance();
-
     //Life Initialization
-    ui->lwin[0].buf[0] = 0x00;
-    ui->lwin[1].buf[0] = 0x00;
+    sUI->lwin[0].buf[0] = 0x00;
+    sUI->lwin[1].buf[0] = 0x00;
     
     // Init NCurses
     LogHandler::WriteLog(Language::Get(LOG_LOAD_CURSES));
@@ -75,8 +65,8 @@ void TheLife::LoadLife() {
     LogHandler::WriteLog(Language::Get(LOG_LOAD_UI));
     Interface::Load();
     
-    ui->SetHidden(FALSE, WCON);
-    ui->SetHidden(FALSE, WSTA);    
+    sUI->SetHidden(FALSE, WCON);
+    sUI->SetHidden(FALSE, WSTA);    
     
     // Init Player
     LogHandler::WriteLog(Language::Get(LOG_LOAD_PLAYER));
@@ -91,8 +81,8 @@ void TheLife::LoadLife() {
     pthread_create(&status, NULL, Thread::Status, NULL);
     pthread_create(&main, NULL, Thread::Run, NULL);
     LogHandler::WriteLog(Language::Get(LOG_LOAD_TH_ADD));
-    th->AddThread(status);
-    th->AddThread(main);
+    sThread->AddThread(status);
+    sThread->AddThread(main);
     LogHandler::WriteLog(Language::Get(LOG_LOAD_TH_JOIN));
     pthread_join(status,NULL);
     pthread_join(main, NULL);    
@@ -104,9 +94,6 @@ void TheLife::LoadLife() {
 }
 
 void TheLife::UnloadLife() {
-
-    Interface::UI *ui = Interface::UI::getInstance();
-    Thread::cThread *th = Thread::cThread::getInstance();
     
     LogHandler::WriteLog(Language::Get(LOG_UNLOAD_BEGIN));
     
@@ -120,8 +107,6 @@ void TheLife::UnloadLife() {
     
     // Delete interface & thread instances
     LogHandler::WriteLog(Language::Get(LOG_UNLOAD_INSTANCE));
-    delete ui;
-    delete th;
 
     LogHandler::WriteLog(Language::Get(LOG_UNLOAD_END));
     std::cout << "TheLife exit succefully!\n";
@@ -130,46 +115,45 @@ void TheLife::UnloadLife() {
 int TheLife::KeyHandle(int key, int keycolor) {
 
     int width, height, i;
-    Interface::UI *ui = Interface::UI::getInstance();
     CommandHandler *Command;
     
-    width = ui->GetX(WCON) - 1;
+    width = sUI->GetX(WCON) - 1;
     height = 1;
 
     Debug(Language::Get(DEBUG_KEY_HANDLE).c_str(), key);
 
     switch (key) {
         case KEY_LEFT:
-            if (ui->lwin[WCON].field_ptr > 0)
-                ui->lwin[WCON].field_ptr--;
+            if (sUI->lwin[WCON].field_ptr > 0)
+                sUI->lwin[WCON].field_ptr--;
             break;
         case KEY_RIGHT:
-            if (ui->lwin[WCON].field_ptr < ui->lwin[WCON].field_length)
-                ui->lwin[WCON].field_ptr++;
+            if (sUI->lwin[WCON].field_ptr < sUI->lwin[WCON].field_length)
+                sUI->lwin[WCON].field_ptr++;
             break;
         case KEY_BACKSPACE:
         case 127:
-            if (ui->lwin[WCON].field_ptr > 0) {
-                ui->lwin[WCON].field_ptr--;
-                ui->lwin[WCON].field_length--;
-                for (i = ui->lwin[WCON].field_ptr; i < ui->lwin[WCON].field_length; i++)
-                    ui->lwin[WCON].field_buf[i] = ui->lwin[WCON].field_buf[i + 1];
-                ui->lwin[WCON].field_buf[i] = 0x00;
+            if (sUI->lwin[WCON].field_ptr > 0) {
+                sUI->lwin[WCON].field_ptr--;
+                sUI->lwin[WCON].field_length--;
+                for (i = sUI->lwin[WCON].field_ptr; i < sUI->lwin[WCON].field_length; i++)
+                    sUI->lwin[WCON].field_buf[i] = sUI->lwin[WCON].field_buf[i + 1];
+                sUI->lwin[WCON].field_buf[i] = 0x00;
             }
             break;
         case '\n':
         case '\r':
-            if (ui->lwin[WCON].field_buf[0] == 0x00)
+            if (sUI->lwin[WCON].field_buf[0] == 0x00)
                break;
 
-            wattron(ui->GetConsole(0, 0), COLOR_PAIR(keycolor));
-            Command->CommandProcess(ui->lwin[WCON].field_buf);
-            wattroff(ui->GetConsole(0, 0), COLOR_PAIR(keycolor));
+            wattron(sUI->GetConsole(0, 0), COLOR_PAIR(keycolor));
+            Command->CommandProcess(sUI->lwin[WCON].field_buf);
+            wattroff(sUI->GetConsole(0, 0), COLOR_PAIR(keycolor));
 
-            ui->lwin[WCON].field_buf[0] = 0x00;
-            ui->lwin[WCON].field_ptr = 0x00;
-            ui->lwin[WCON].field_length = 0x00;
-            werase(ui->GetConsole(WCON, 1));
+            sUI->lwin[WCON].field_buf[0] = 0x00;
+            sUI->lwin[WCON].field_ptr = 0x00;
+            sUI->lwin[WCON].field_length = 0x00;
+            werase(sUI->GetConsole(WCON, 1));
             break;
         case -1:
         case KEY_RESIZE:
@@ -178,28 +162,26 @@ int TheLife::KeyHandle(int key, int keycolor) {
             return -1;
             break;
         default:
-            if (ui->lwin[WCON].field_length >= FIELDBUFSIZE - 1)
+            if (sUI->lwin[WCON].field_length >= FIELDBUFSIZE - 1)
                 return -1;
 
-            for (i = ui->lwin[WCON].field_length; i > ui->lwin[WCON].field_ptr && i > 0; i--)
-                ui->lwin[WCON].field_buf[i] = ui->lwin[WCON].field_buf[i - 1];
+            for (i = sUI->lwin[WCON].field_length; i > sUI->lwin[WCON].field_ptr && i > 0; i--)
+                sUI->lwin[WCON].field_buf[i] = sUI->lwin[WCON].field_buf[i - 1];
 
-            ui->lwin[WCON].field_buf[ui->lwin[WCON].field_ptr] = key;
-            ui->lwin[WCON].field_buf[ui->lwin[WCON].field_length + 1] = 0x00;
-            ui->lwin[WCON].field_ptr++;
-            ui->lwin[WCON].field_length++;
+            sUI->lwin[WCON].field_buf[sUI->lwin[WCON].field_ptr] = key;
+            sUI->lwin[WCON].field_buf[sUI->lwin[WCON].field_length + 1] = 0x00;
+            sUI->lwin[WCON].field_ptr++;
+            sUI->lwin[WCON].field_length++;
             break;
         }
-        Interface::ConsoleBuffer(ui->GetConsole(WCON, 1), ui->lwin[WCON].field_buf, height, width, ui->lwin[WCON].field_ptr);
-        wrefresh(ui->GetConsole(WCON, 1));
+        Interface::ConsoleBuffer(sUI->GetConsole(WCON, 1), sUI->lwin[WCON].field_buf, height, width, sUI->lwin[WCON].field_ptr);
+        wrefresh(sUI->GetConsole(WCON, 1));
         return 0;
 }
 
 void TheLife::Debug(std::string debug, ...) {
 
     bool DEBUG = FALSE;
-
-    Interface::UI *ui = Interface::UI::getInstance();
   
     time_t rawtime;
     time ( &rawtime );
@@ -219,17 +201,15 @@ void TheLife::Debug(std::string debug, ...) {
     debug = buffer;
 
     if(DEBUG) {
-      wattron(ui->GetConsole(WCON, 0), COLOR_PAIR(4));
+      wattron(sUI->GetConsole(WCON, 0), COLOR_PAIR(4));
         Interface::ConsoleOutput("Debug[TIME:%s]: %s\n", times.c_str(), debug.c_str());
-      wattroff(ui->GetConsole(WCON, 0), COLOR_PAIR(4));
+      wattroff(sUI->GetConsole(WCON, 0), COLOR_PAIR(4));
     }
   
     LogHandler::WriteDebug(debug);
 }
 
 void TheLife::Error(std::string error, ...) {
-
-    Interface::UI *ui = Interface::UI::getInstance();
 
     char buffer[256];
     va_list arg;
@@ -240,9 +220,9 @@ void TheLife::Error(std::string error, ...) {
     error = buffer;
 
     /*
-    wattron(ui->GetConsole(WCON, 0), COLOR_PAIR(1));
+    wattron(sUI->GetConsole(WCON, 0), COLOR_PAIR(1));
     Interface::ConsoleOutput("Error: %s\n", error.c_str());
-    wattroff(ui->GetConsole(WCON, 0), COLOR_PAIR(1)); */
+    wattroff(sUI->GetConsole(WCON, 0), COLOR_PAIR(1)); */
 
     LogHandler::WriteError(error);
 }
@@ -278,13 +258,11 @@ std::vector<std::string> TheLife::Explode(std::string delimiter, std::string str
 
 void TheLife::SigHandler(int sig) {
 
-    Interface::UI *ui = Interface::UI::getInstance();
-    
     if(sig == SIGWINCH) {
         Interface::Resize();
     }
     else if(sig == SIG_STATUS) {
-        ui->StatusUpdate();
+        sUI->StatusUpdate();
     }
 }
 

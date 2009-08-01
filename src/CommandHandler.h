@@ -19,6 +19,8 @@
 #ifndef COMMANDHANDLER_H
 #define COMMANDHANDLER_H
 
+#include <string>
+
 struct CommandHandler;
 
 struct CommandTable {

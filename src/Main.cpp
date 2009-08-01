@@ -16,33 +16,25 @@
  * 
  */
 
-#include "Share.h"
 #include "config.h"
 #include "Language.h"
 #include "UI/App.h"
 #include "UI/Interface.h"
 
 int main() {
-    
-    TheLife::Application *App = TheLife::Application::getInstance();
-    Language::LanguageHeader *Lng = Language::LanguageHeader::getInstance();
-    config *conf = config::getInstance();
-    
+       
     //Language::Load("finnish.lng");
-    Lng->LoadHeader();    
+    sLangHeader->LoadHeader();    
     
-    conf->LoadConf("data/life.config", conf);
+    sConfig->LoadConf("data/life.config", sConfig);
     
     Interface::LoadMenu();
     
-    if(App->Active())
+    if(sTheLife->Active())
         TheLife::LoadLife();
     
-    if(App->Unload())
+    if(sTheLife->Unload())
         TheLife::UnloadLife();
-
-    delete App;
-    delete conf;
     
     return 0;
 }

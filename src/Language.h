@@ -19,6 +19,13 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+#include <string>
+#include <vector>
+
+#include "Singleton.h"
+
+#define sLangHeader Language::LanguageHeader::getInstance()
+
 // NOTE: This enum must have same order as Language table!!!
 enum LanguageID {
 
@@ -96,24 +103,20 @@ namespace Language {
     void Load(std::string life);
 	std::string Get(LanguageID entry);
 	
-	class LanguageHeader {
-	
-	    protected:
-            static LanguageHeader*  Instance;
-            LanguageHeader() {}
+	class LanguageHeader : public Singleton<LanguageHeader> {
 
         private:
             /* LanguageHeader Data Design
-             0: Language STR
-             1: Localization
-             2: Author
-             3: Version
-             4: Filename (should be Language STR + .lng extension) NYI
+             0: Filename                    | Loaded after vector init
+             1: Language name               | This is defined in .lng file
+             2: Localization                | This is defined in .lng file
+             3: Author                      | This is defined in .lng file
+             4: Version                     | This is defined in .lng file
             */
             std::vector<std::vector <std::string> > data;
 
         public:
-            static LanguageHeader* getInstance();
+            LanguageHeader() {}
             
             void LoadHeader();
             

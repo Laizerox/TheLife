@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2008 The Life
+ * Copyright (C) 2008 TheLife
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +16,9 @@
  * 
  */
 
-#ifndef SHARE_H
-#define SHARE_H
+#ifndef SIGNALDEF_H
+#define SIGNALDEF_H
 
-#include <iostream>
-#include <string>
-#include <signal.h>
-#include <vector>
-#include <fstream>
-#include <cstring>
-#include <sstream>
-#include <time.h>
-#include <errno.h>
-#include <locale.h>
-
-// NCurses Wide char include
-#include <ncursesw/ncurses.h>
-#include <ncursesw/panel.h>
-#include <ncursesw/menu.h>
-
-// Life custom signals
 #define SIG_STATUS (SIGRTMIN)
 
 #endif
-

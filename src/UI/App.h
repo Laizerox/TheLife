@@ -18,6 +18,15 @@
 
 #ifndef APP_H
 #define APP_H
+
+#include <string>
+#include <vector>
+#include <ctime>
+
+#include "../Singleton.h"
+
+#define sTheLife TheLife::Application::getInstance()
+
 namespace TheLife {
 
         void LoadLife();
@@ -34,18 +43,14 @@ namespace TheLife {
         void CharStr(std::string ch, std::string& str);
         bool CharCheck(std::string ch, const char *str, int n = 0);
 
-        class Application {
-
-            protected:
-                static Application *Instance;
-                Application() {}
+        class Application : public Singleton<Application> {
 
             private:
                 bool quit;
                 bool unload;
 
             public:
-                static Application *getInstance();
+                Application() {}
 
                 // Application Control Functions
                 bool Active() { return quit; }

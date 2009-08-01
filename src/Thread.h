@@ -19,28 +19,29 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include <vector>
 #include <pthread.h>
+
+#include "Singleton.h"
+
+#define sThread Thread::cThread::getInstance()
 
 namespace Thread {
 
         void *Run(void *arg);
         void *Status(void *arg);
 
-        class cThread {
-
-            protected:
-                static cThread* Instance;
-                cThread() {}
+        class cThread : public Singleton<cThread> {
 
             private:
                 std::vector<pthread_t> tList;
 
             public:
+                cThread() {}
+                
                 void AddThread(pthread_t thread) { this->tList.push_back(thread); }
                 int ListThread() { return this->tList.size(); }
                 virtual pthread_t GetThread(int i) { return tList[i]; }
-
-                static cThread* getInstance();
         };
 };
 

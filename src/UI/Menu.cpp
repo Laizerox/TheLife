@@ -16,7 +16,8 @@
  * 
  */
 
-#include "../Share.h"
+#include <cstdlib>
+
 #include "../config.h"
 #include "../Language.h"
 #include "Interface.h"
@@ -25,13 +26,10 @@
 void Interface::LoadMenu()
 {
     int y, x, c;
-    Interface::Menu *menu = Interface::Menu::getInstance();
-    TheLife::Application *App = TheLife::Application::getInstance();
-    config *conf = config::getInstance();
 
-    App->SetActive(FALSE);
-    App->SetUnload(FALSE);
-    menu->SetActive(TRUE);
+    sTheLife->SetActive(FALSE);
+    sTheLife->SetUnload(FALSE);
+    sMenu->SetActive(TRUE);
     
     /* Initialize curses */
     initscr();
@@ -43,55 +41,55 @@ void Interface::LoadMenu()
     // Initialization
     getmaxyx( stdscr, y, x );
 
-    menu->SetY(y - MENU_HEIGHT);
-    menu->SetX(x - MENU_WIDTH);
-    menu->SetWindow(newwin( 15, 30, (int)(menu->GetY() * 0.5), (int)(menu->GetX() * 0.5)));
+    sMenu->SetY(y - MENU_HEIGHT);
+    sMenu->SetX(x - MENU_WIDTH);
+    sMenu->SetWindow(newwin( 15, 30, (int)(sMenu->GetY() * 0.5), (int)(sMenu->GetX() * 0.5)));
         
     // Create items
-    menu->ch = (ITEM **) calloc(4, sizeof(ITEM *));
-    menu->ch[0] = new_item(Language::Get(MSG_MENU_OPT_START).c_str(), "");
-    menu->ch[1] = new_item(Language::Get(MSG_MENU_OPT_OPTIONS).c_str(), "");
-    menu->ch[2] = new_item(Language::Get(MSG_MENU_OPT_EXIT).c_str(), "");
+    sMenu->ch = (ITEM **) calloc(4, sizeof(ITEM *));
+    sMenu->ch[0] = new_item(Language::Get(MSG_MENU_OPT_START).c_str(), "");
+    sMenu->ch[1] = new_item(Language::Get(MSG_MENU_OPT_OPTIONS).c_str(), "");
+    sMenu->ch[2] = new_item(Language::Get(MSG_MENU_OPT_EXIT).c_str(), "");
     
-    set_item_userptr(menu->ch[0], (void *) &Interface::MenuLife);
-    set_item_userptr(menu->ch[2], (void *) &Interface::MenuQuit);   
+    set_item_userptr(sMenu->ch[0], (void *) &Interface::MenuLife);
+    set_item_userptr(sMenu->ch[2], (void *) &Interface::MenuQuit);   
     
     // Create menu
-    menu->SetMenu(new_menu((ITEM **)menu->ch));
+    sMenu->SetMenu(new_menu((ITEM **)sMenu->ch));
 
-    keypad(menu->GetWindow(), TRUE);
+    keypad(sMenu->GetWindow(), TRUE);
      
     // Misc
-    getmaxyx( menu->GetWindow(), y, x );
+    getmaxyx( sMenu->GetWindow(), y, x );
     
-    menu_opts_off(menu->GetMenu(), O_SHOWDESC);
-    set_menu_win(menu->GetMenu(), menu->GetWindow());
-    set_menu_sub(menu->GetMenu(), derwin(menu->GetWindow(), 0, 0, 5, (int)(y * 0.5) + 2));
-    set_menu_mark(menu->GetMenu(), " * ");
+    menu_opts_off(sMenu->GetMenu(), O_SHOWDESC);
+    set_menu_win(sMenu->GetMenu(), sMenu->GetWindow());
+    set_menu_sub(sMenu->GetMenu(), derwin(sMenu->GetWindow(), 0, 0, 5, (int)(y * 0.5) + 2));
+    set_menu_mark(sMenu->GetMenu(), " * ");
 
     mvprintw(LINES - 2, 0, Language::Get(MSG_MENU_USE).c_str());
-    mvprintw(LINES - 1, 0, "%s %s - %s", Language::Get(NAME_THELIFE).c_str(), conf->GetVariable("version").c_str(), Language::Get(MSG_MENU_DEVEL).c_str());
+    mvprintw(LINES - 1, 0, "%s %s - %s / Compiled with: %s (%s)", Language::Get(NAME_THELIFE).c_str(), config::getInstance()->GetVariable("version").c_str(), Language::Get(MSG_MENU_DEVEL).c_str(), __VERSION__, __DATE__);
     
-    box(menu->GetWindow(), 0, 0);
-    mvwhline( menu->GetWindow(), 2, 1, 0, x-2);
+    box(sMenu->GetWindow(), 0, 0);
+    mvwhline( sMenu->GetWindow(), 2, 1, 0, x-2);
     refresh();
         
-    post_menu(menu->GetMenu());
-    wrefresh(menu->GetWindow());
+    post_menu(sMenu->GetMenu());
+    wrefresh(sMenu->GetWindow());
 
-    while(menu->Active())
+    while(sMenu->Active())
     {
         // Key Handler
-        if ((c = wgetch(menu->GetWindow())) != ERR) {  
+        if ((c = wgetch(sMenu->GetWindow())) != ERR) {  
 
             switch(c)
             {
                 case KEY_DOWN:
-                    menu_driver(menu->GetMenu(), REQ_DOWN_ITEM);
+                    menu_driver(sMenu->GetMenu(), REQ_DOWN_ITEM);
                     break;
 
                 case KEY_UP:
-                    menu_driver(menu->GetMenu(), REQ_UP_ITEM);
+                    menu_driver(sMenu->GetMenu(), REQ_UP_ITEM);
                     break;
                 
                 case 10: /* Enter */
@@ -99,42 +97,37 @@ void Interface::LoadMenu()
                     ITEM *current;
                     void (*p)();
                 
-                    current = current_item(menu->GetMenu());
+                    current = current_item(sMenu->GetMenu());
                     p = (void (*)()) item_userptr(current);
                     p();
-                    pos_menu_cursor(menu->GetMenu());
+                    pos_menu_cursor(sMenu->GetMenu());
                     break;
                 }
                 break;
             }
-            wrefresh(menu->GetWindow());
+            wrefresh(sMenu->GetWindow());
         }
     }
     
-    unpost_menu(menu->GetMenu());
+    unpost_menu(sMenu->GetMenu());
     
-    for(int i = 0; i < item_count(menu->GetMenu()); ++i)
-        free_item(menu->ch[i]);
+    for(int i = 0; i < item_count(sMenu->GetMenu()); ++i)
+        free_item(sMenu->ch[i]);
 
-    free_menu(menu->GetMenu());
-    delwin(menu->GetWindow());
-    free((void *) menu->ch);
+    free_menu(sMenu->GetMenu());
+    delwin(sMenu->GetWindow());
+    free((void *) sMenu->ch);
     refresh();
     endwin();
-    delete menu;
 }
 
 void Interface::MenuQuit() {
     
-    Interface::Menu *menu = Interface::Menu::getInstance();
-    menu->SetActive(FALSE);
+    sMenu->SetActive(FALSE);
 }
 
 void Interface::MenuLife() {
-        
-    Interface::Menu *menu = Interface::Menu::getInstance();
-    TheLife::Application *App = TheLife::Application::getInstance();
     
-    App->SetActive(TRUE);
-    menu->SetActive(FALSE);
+    sTheLife->SetActive(TRUE);
+    sMenu->SetActive(FALSE);
 }

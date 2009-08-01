@@ -4,7 +4,6 @@ bin_PROGRAMS=life
 life_SOURCES= \
 	Main.cpp \
 	Thread.cpp \
-	Unit.cpp \
 	CommandHandler.cpp \
 	Config.cpp \
 	LogHandler.cpp \
@@ -13,6 +12,5 @@ life_SOURCES= \
 	UI/Console.cpp \
 	UI/UI.cpp \
 	UI/Status.cpp \
-	UI/Interface.cpp \
 	UI/Menu.cpp \
 	UI/App.cpp

@@ -16,38 +16,26 @@
  * 
  */
 
-#include "Share.h"
+#include <fstream>
+#include <string>
+
 #include "FileHandler.h"
 #include "Unit.h"
 #include "config.h"
 #include "Language.h"
 #include "UI/App.h"
 
-FileHandler::LD_FILE* FileHandler::LD_FILE::Instance = NULL;
-
-FileHandler::LD_FILE* FileHandler::LD_FILE::getInstance()
-{
-    if(Instance == NULL)  {
-
-        Instance = new FileHandler::LD_FILE();
-    }
-
-    return Instance;
-}
-
 void FileHandler::PlayerInit() {
 
-    UnitStore *us = UnitStore::getInstance();
     Unit *u = new Unit(); 
-    LD_FILE *ld_f = LD_FILE::getInstance();
 
-    us->StoreUnit(u);
+    sUnitStore->StoreUnit(u);
     
     if(!LoadPlayer()) {
 
-      if(ld_f->first_load)  {
-          ld_f->loaded_ldh = LDH;
-          ld_f->loaded_ldv = LDV;
+      if(sFileHandler->first_load)  {
+          sFileHandler->loaded_ldh = LDH;
+          sFileHandler->loaded_ldv = LDV;
       }
 
       SavePlayer();
@@ -58,25 +46,16 @@ void FileHandler::PlayerUnload() {
 
     SavePlayer();
     
-    UnitStore *us = UnitStore::getInstance();
-    LD_FILE *ld_f = LD_FILE::getInstance();
-    
-    for(int i = 0; i < us->UnitSize(); ++i)
-        delete us->ReturnUnit(i);
-    
-    delete ld_f;
-    delete us;
+    for(int i = 0; i < sUnitStore->UnitSize(); ++i)
+        delete sUnitStore->ReturnUnit(i);
 }
 
 void FileHandler::SavePlayer() {
 
-    config *conf = config::getInstance();
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
-    LD_FILE *ld_f = LD_FILE::getInstance();
+    Unit *u = sUnitStore->ReturnUnit(0);
 
-    std::string path = conf->GetVariable("ldpath");
-    std::string name = conf->GetVariable("playerfile");
+    std::string path = sConfig->GetVariable("ldpath");
+    std::string name = sConfig->GetVariable("playerfile");
     
     int tmpInt;
     std::string tmpStr;
@@ -93,10 +72,10 @@ void FileHandler::SavePlayer() {
 
     std::fstream player_ld (file.c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
-    tmpInt = ld_f->loaded_ldh;
+    tmpInt = sFileHandler->loaded_ldh;
     player_ld.write((char *)&tmpInt, 4);
 
-    tmpInt = ld_f->loaded_ldv;
+    tmpInt = sFileHandler->loaded_ldv;
     player_ld.write((char *)&tmpInt, 4);
 
     tmpInt = (u->GetName().size());
@@ -119,13 +98,10 @@ void FileHandler::SavePlayer() {
 
 bool FileHandler::LoadPlayer() {
 
-    config *conf = config::getInstance();
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
-    LD_FILE *ld_f = LD_FILE::getInstance();
+    Unit *u = sUnitStore->ReturnUnit(0);
 
-    std::string path = conf->GetVariable("ldpath");
-    std::string name = conf->GetVariable("playerfile");
+    std::string path = sConfig->GetVariable("ldpath");
+    std::string name = sConfig->GetVariable("playerfile");
 
     int tmpInt;
     std::string tmpStr;
@@ -144,25 +120,25 @@ bool FileHandler::LoadPlayer() {
 
     if(!player_ld) {
 
-        ld_f->first_load = true;
+        sFileHandler->first_load = true;
         return false;
     }
 
     player_ld.read((char *)&tmpInt, 4);
-    ld_f->loaded_ldh = tmpInt;
+    sFileHandler->loaded_ldh = tmpInt;
 
     player_ld.read((char *)&tmpInt, 4);
-    ld_f->loaded_ldv = tmpInt;
+    sFileHandler->loaded_ldv = tmpInt;
 
-    if(!CheckLDH(ld_f->loaded_ldh)) {
+    if(!CheckLDH(sFileHandler->loaded_ldh)) {
 
-        TheLife::Error(Language::Get(ERROR_PLAYER_WRONG_DHEAD).c_str(), ld_f->loaded_ldh);
+        TheLife::Error(Language::Get(ERROR_PLAYER_WRONG_DHEAD).c_str(), sFileHandler->loaded_ldh);
         return false;
     }
 
-    if(!CheckLDV(ld_f->loaded_ldv)) {
+    if(!CheckLDV(sFileHandler->loaded_ldv)) {
 
-        TheLife::Error(Language::Get(ERROR_PLAYER_WRONG_DVER).c_str(), ld_f->loaded_ldv);
+        TheLife::Error(Language::Get(ERROR_PLAYER_WRONG_DVER).c_str(), sFileHandler->loaded_ldv);
         return false;
     }
 

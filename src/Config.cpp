@@ -16,22 +16,12 @@
  * 
  */
 
-#include "Share.h"
+#include <fstream>
+
 #include "config.h"
 #include "Language.h"
 #include "UI/App.h"
 
-config* config::Instance = NULL;
-
-config* config::getInstance()
-{
-    if(Instance == NULL)  {
-
-        Instance = new config();
-    }
-
-    return Instance;
-}
 
 // config::GetConf(std::string); read Conf data from string data vector in class config
 std::string config::GetVariable(std::string look, int pos)  {

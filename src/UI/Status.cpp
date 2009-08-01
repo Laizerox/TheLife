@@ -16,7 +16,8 @@
  * 
  */
 
-#include "../Share.h"
+#include <cstring>
+
 #include "../Thread.h"
 #include "../Unit.h"
 #include "App.h"
@@ -25,30 +26,27 @@
 void Interface::StatusInit(std::string text) {
 
     int y, x;
-    Interface::UI *ui = Interface::UI::getInstance();
 
     // Initialization
     getmaxyx( stdscr, y, x );
 
-    ui->SetY(y, WSTA);
-    ui->SetX(CONS_WIDTH, WSTA);
-    ui->SetWindow(newwin( ui->GetY(WSTA), ui->GetX(WSTA), 0, x - CONS_WIDTH ), WSTA);
-    ui->SetStatus(derwin( ui->GetWindow(WSTA), ui->GetY(WSTA) - 6 , ui->GetX(WSTA) - 4, 1, 2 ), WSTA);
-    idlok( ui->GetStatus(WSTA, 0), TRUE );
-    scrollok( ui->GetStatus(WSTA, 0), TRUE );
+    sUI->SetY(y, WSTA);
+    sUI->SetX(CONS_WIDTH, WSTA);
+    sUI->SetWindow(newwin( sUI->GetY(WSTA), sUI->GetX(WSTA), 0, x - CONS_WIDTH ), WSTA);
+    sUI->SetStatus(derwin( sUI->GetWindow(WSTA), sUI->GetY(WSTA) - 6 , sUI->GetX(WSTA) - 4, 1, 2 ), WSTA);
+    idlok( sUI->GetStatus(WSTA, 0), TRUE );
+    scrollok( sUI->GetStatus(WSTA, 0), TRUE );
 
     // Draw
-    box( ui->GetWindow(WSTA), 0, 0 );
+    box( sUI->GetWindow(WSTA), 0, 0 );
     StatusTitle( text );
 }
 
 void Interface::StatusTitle(std::string text) {
 
-    Interface::UI *ui = Interface::UI::getInstance();
-
-    wattron( ui->GetWindow(WSTA), A_BOLD );
-    mvwaddnstr( ui->GetWindow(WSTA), 0, 2, text.c_str(), ui->GetX(WSTA) - 4 );
-    wattroff( ui->GetWindow(WSTA), A_BOLD );
+    wattron( sUI->GetWindow(WSTA), A_BOLD );
+    mvwaddnstr( sUI->GetWindow(WSTA), 0, 2, text.c_str(), sUI->GetX(WSTA) - 4 );
+    wattroff( sUI->GetWindow(WSTA), A_BOLD );
 }
 
 void Interface::StatusOutput(std::string text, ...) {
@@ -56,30 +54,26 @@ void Interface::StatusOutput(std::string text, ...) {
     char buf[2048];
     va_list ap;
 
-    Interface::UI *ui = Interface::UI::getInstance();
-
     va_start(ap, text.c_str());
     vsnprintf(buf, sizeof(buf) - 1, text.c_str(), ap);
     va_end(ap);
 
-    if (CSBUF <= (strlen(ui->lwin[WSTA].buf) + strlen(buf))) {
-        strncpy(ui->lwin[WSTA].buf, &ui->lwin[WSTA].buf[strlen(buf)], CSBUF - 1);
-        ui->lwin[WSTA].buf[strlen(buf)] = 0x00;
+    if (CSBUF <= (strlen(sUI->lwin[WSTA].buf) + strlen(buf))) {
+        strncpy(sUI->lwin[WSTA].buf, &sUI->lwin[WSTA].buf[strlen(buf)], CSBUF - 1);
+        sUI->lwin[WSTA].buf[strlen(buf)] = 0x00;
     }
-    strncat(ui->lwin[WSTA].buf, buf, CSBUF - 1 - strlen(buf) - strlen(ui->lwin[WSTA].buf));
-    waddstr(ui->GetStatus(WSTA, 0), buf);
+    strncat(sUI->lwin[WSTA].buf, buf, CSBUF - 1 - strlen(buf) - strlen(sUI->lwin[WSTA].buf));
+    waddstr(sUI->GetStatus(WSTA, 0), buf);
 
-    if(ui)
+    if(sUI)
     {
-        wrefresh(ui->GetStatus(WSTA, 0));
+        wrefresh(sUI->GetStatus(WSTA, 0));
     }
 }
 
 void Interface::UI::StatusUpdate()  {
-
-    UnitStore *us = UnitStore::getInstance();
-    Unit *u = us->ReturnUnit(0);
-    TheLife::Application *App = TheLife::Application::getInstance();
+    
+    Unit *u = sUnitStore->ReturnUnit(0);
 
     std::string sex;
     std::string occ;
@@ -115,7 +109,7 @@ void Interface::UI::StatusUpdate()  {
 
         werase(GetStatus(WSTA, 0));
 
-        if(App->Active()) {
+        if(sTheLife->Active()) {
             
             StatusOutput("Name: %s\n", u->GetName().c_str());
             StatusOutput("Sex: %s\n", sex.c_str());

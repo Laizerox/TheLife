@@ -16,7 +16,9 @@
  * 
  */
 
-#include "Share.h"
+#include <fstream>
+#include <string>
+
 #include "config.h"
 #include "LogHandler.h"
 #include "Language.h"
@@ -24,12 +26,11 @@
 
 void LogHandler::WriteLog(std::string text) {
 
-    config *conf = config::getInstance();
     std::string whitespace("\n");
     size_t found;
 
-    std::string path = conf->GetVariable("logpath");
-    std::string name = conf->GetVariable("logname");
+    std::string path = sConfig->GetVariable("logpath");
+    std::string name = sConfig->GetVariable("logname");
     std::string logtime;
 
     if(path.empty() | name.empty()) {
@@ -69,12 +70,11 @@ void LogHandler::WriteLog(std::string text) {
 
 void LogHandler::WriteDebug(std::string text) {
 
-    config *conf = config::getInstance();
     std::string whitespace("\n");
     size_t found;
 
-    std::string path = conf->GetVariable("logpath");
-    std::string name = conf->GetVariable("debugfile");
+    std::string path = sConfig->GetVariable("logpath");
+    std::string name = sConfig->GetVariable("debugfile");
     std::string logtime;
 
     if(path.empty() | name.empty()) {
@@ -114,12 +114,11 @@ void LogHandler::WriteDebug(std::string text) {
 
 void LogHandler::WriteError(std::string text) {
 
-    config *conf = config::getInstance();
     std::string whitespace("\n");
     size_t found;
 
-    std::string path = conf->GetVariable("logpath");
-    std::string name = conf->GetVariable("errorfile");
+    std::string path = sConfig->GetVariable("logpath");
+    std::string name = sConfig->GetVariable("errorfile");
     std::string logtime;
 
     if(path.empty() | name.empty()) {

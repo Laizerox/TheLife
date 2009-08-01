@@ -16,11 +16,11 @@
  * 
  */
 
-#include "Share.h"
+#include <fstream>
+#include <cstring>
+
 #include "Language.h"
 #include "UI/App.h"
-
-Language::LanguageHeader* Language::LanguageHeader::Instance = NULL;
 
 // NOTE: This table must have same order as LanguageID enum!!!
 LanguageInfo lng[] =
@@ -86,16 +86,6 @@ LanguageInfo lng[] =
     { END_LANGUAGE                  , NULL                          , "NULL"                                                                        }
 };
 
-Language::LanguageHeader* Language::LanguageHeader::getInstance()
-{
-    if(Instance == NULL)  {
-
-        Instance = new LanguageHeader();
-    }
-
-    return Instance;
-}
-
 std::string Language::LanguageHeader::ReadHeadInfo(std::string look, int pos)  {
 
     std::size_t found = -1;
@@ -143,6 +133,8 @@ void Language::LanguageHeader::LoadHeader() {
         }
 
         std::string line;
+        this->data.push_back(std::vector<std::string>());
+        data[i].push_back(list[i]); // Language file as whole for "identifier"
         
         while(getline(file, line))
         {
@@ -151,8 +143,8 @@ void Language::LanguageHeader::LoadHeader() {
             else if(line.at(0) == exp.at(0))
             {
                 std::vector<std::string> info = TheLife::Explode(" ", line);
-                TheLife::Debug("Loading %s from file %s\n", info[1].c_str(), list[i].c_str());
-                this->data.push_back(std::vector<std::string>());
+                TheLife::CharStr("%", info[0]);
+                TheLife::Debug("Loading %s %s from file %s\n", info[0].c_str(), info[1].c_str(), list[i].c_str());
                 data[i].push_back(info[1]);
             }
         }

@@ -19,18 +19,21 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-class config {
+#include <vector>
+#include <string>
 
-    protected:
-        static config*  Instance;
-        config() {}
+#include "Singleton.h"
 
+#define sConfig config::getInstance()
+
+class config : public Singleton <config>
+{
     private:
         std::vector<std::vector <std::string> > data;
 
     public:
-        static config* getInstance();
-
+        config() {}
+        
         // Conf reading
         virtual std::string GetVariable(std::string look, int pos = 1);
         virtual int GetDataSize(int slot = -1) { return (slot > -1) ? data[slot].size() : data.size(); }

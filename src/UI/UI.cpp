@@ -16,27 +16,24 @@
  * 
  */
 
-#include "../Share.h"
 #include "../Language.h"
 #include "Interface.h"
 #include "App.h"
 
 void Interface::Load() {
 
-    Interface::UI *ui = Interface::UI::getInstance();
-
     // Initialize
     ConsoleInit("Console");
     StatusInit("Status");
 
-    ui->SetPanel(new_panel(ui->GetWindow(WCON)), WCON); // Console
-    ui->SetPanel(new_panel(ui->GetWindow(WSTA)), WSTA); // Status
+    sUI->SetPanel(new_panel(sUI->GetWindow(WCON)), WCON); // Console
+    sUI->SetPanel(new_panel(sUI->GetWindow(WSTA)), WSTA); // Status
 
     // Draw
-    box(ui->GetWindow(WCON), 0, 0);
+    box(sUI->GetWindow(WCON), 0, 0);
     ConsoleTitle("Console");
 
-    box(ui->GetWindow(WSTA), 0, 0);
+    box(sUI->GetWindow(WSTA), 0, 0);
     StatusTitle("Status");
 
     update_panels();
@@ -45,13 +42,11 @@ void Interface::Load() {
 
 void Interface::Unload()  {
 
-    Interface::UI *ui = Interface::UI::getInstance();
-
     for(int i = 0; i < PANS; ++i) {
         
-        ui->lwin[i].window.clear();
-        delwin(ui->GetWindow(i));
-        del_panel(ui->GetPanel(i));
+        sUI->lwin[i].window.clear();
+        delwin(sUI->GetWindow(i));
+        del_panel(sUI->GetPanel(i));
     }
     
     refresh();

@@ -16,7 +16,12 @@
  * 
  */
 
-#include "Share.h"
+#include <csignal>
+#include <cerrno>
+#include <cstdio>
+#include <ncursesw/ncurses.h>
+
+#include "SignalDef.h"
 #include "Thread.h"
 #include "Language.h"
 #include "LogHandler.h"
@@ -24,25 +29,12 @@
 
 #define MICRO 1000000
 
-Thread::cThread* Thread::cThread::Instance = NULL;
-
-Thread::cThread* Thread::cThread::getInstance()
-{
-    if(Instance == NULL)  {
-
-        Instance = new cThread();
-    }
-
-    return Instance;
-}
-
 void *Thread::Run(void *arg) {
 
-    TheLife::Application *App = TheLife::Application::getInstance();
     int key;
 
     // Life Main loop
-    while(App->Active()) {
+    while(sTheLife->Active()) {
   
         // Key Handler
         if ((key = getch()) != ERR) {
