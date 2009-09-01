@@ -51,7 +51,7 @@ void TheLife::LoadLife() {
     initscr();
     start_color();
     use_default_colors();
-    noecho();
+    //noecho();
     keypad( stdscr, TRUE );
 
     // Init colors
@@ -65,8 +65,8 @@ void TheLife::LoadLife() {
     LogHandler::WriteLog(Language::Get(LOG_LOAD_UI));
     Interface::Load();
     
-    sUI->SetHidden(FALSE, WCON);
-    sUI->SetHidden(FALSE, WSTA);    
+    sUI->SetHidden(FALSE, WINDOW_CONSOLE);
+    sUI->SetHidden(FALSE, WINDOW_STATUS);    
     
     // Init Player
     LogHandler::WriteLog(Language::Get(LOG_LOAD_PLAYER));
@@ -107,6 +107,13 @@ void TheLife::UnloadLife() {
     
     // Delete interface & thread instances
     LogHandler::WriteLog(Language::Get(LOG_UNLOAD_INSTANCE));
+    TheLife::Application::destroy();
+    Thread::cThread::destroy();
+    //config::destroy();
+    Interface::UI::destroy();
+    Interface::Menu::destroy();
+    FileHandler::LD_FILE::destroy();
+    Language::LanguageHeader::destroy();
 
     LogHandler::WriteLog(Language::Get(LOG_UNLOAD_END));
     std::cout << "TheLife exit succefully!\n";
@@ -117,43 +124,43 @@ int TheLife::KeyHandle(int key, int keycolor) {
     int width, height, i;
     CommandHandler *Command;
     
-    width = sUI->GetX(WCON) - 1;
+    width = sUI->GetX(WINDOW_CONSOLE) - 1;
     height = 1;
 
     Debug(Language::Get(DEBUG_KEY_HANDLE).c_str(), key);
 
     switch (key) {
         case KEY_LEFT:
-            if (sUI->lwin[WCON].field_ptr > 0)
-                sUI->lwin[WCON].field_ptr--;
+            if (sUI->lwin[WINDOW_CONSOLE].field_ptr > 0)
+                sUI->lwin[WINDOW_CONSOLE].field_ptr--;
             break;
         case KEY_RIGHT:
-            if (sUI->lwin[WCON].field_ptr < sUI->lwin[WCON].field_length)
-                sUI->lwin[WCON].field_ptr++;
+            if (sUI->lwin[WINDOW_CONSOLE].field_ptr < sUI->lwin[WINDOW_CONSOLE].field_length)
+                sUI->lwin[WINDOW_CONSOLE].field_ptr++;
             break;
         case KEY_BACKSPACE:
         case 127:
-            if (sUI->lwin[WCON].field_ptr > 0) {
-                sUI->lwin[WCON].field_ptr--;
-                sUI->lwin[WCON].field_length--;
-                for (i = sUI->lwin[WCON].field_ptr; i < sUI->lwin[WCON].field_length; i++)
-                    sUI->lwin[WCON].field_buf[i] = sUI->lwin[WCON].field_buf[i + 1];
-                sUI->lwin[WCON].field_buf[i] = 0x00;
+            if (sUI->lwin[WINDOW_CONSOLE].field_ptr > 0) {
+                sUI->lwin[WINDOW_CONSOLE].field_ptr--;
+                sUI->lwin[WINDOW_CONSOLE].field_length--;
+                for (i = sUI->lwin[WINDOW_CONSOLE].field_ptr; i < sUI->lwin[WINDOW_CONSOLE].field_length; i++)
+                    sUI->lwin[WINDOW_CONSOLE].field_buf[i] = sUI->lwin[WINDOW_CONSOLE].field_buf[i + 1];
+                sUI->lwin[WINDOW_CONSOLE].field_buf[i] = 0x00;
             }
             break;
         case '\n':
         case '\r':
-            if (sUI->lwin[WCON].field_buf[0] == 0x00)
+            if (sUI->lwin[WINDOW_CONSOLE].field_buf[0] == 0x00)
                break;
 
-            wattron(sUI->GetConsole(0, 0), COLOR_PAIR(keycolor));
-            Command->CommandProcess(sUI->lwin[WCON].field_buf);
-            wattroff(sUI->GetConsole(0, 0), COLOR_PAIR(keycolor));
+            wattron(sUI->GetConsole(WINDOW_CONSOLE, 0), COLOR_PAIR(keycolor));
+            Command->CommandProcess(sUI->lwin[WINDOW_CONSOLE].field_buf);
+            wattroff(sUI->GetConsole(WINDOW_CONSOLE, 0), COLOR_PAIR(keycolor));
 
-            sUI->lwin[WCON].field_buf[0] = 0x00;
-            sUI->lwin[WCON].field_ptr = 0x00;
-            sUI->lwin[WCON].field_length = 0x00;
-            werase(sUI->GetConsole(WCON, 1));
+            sUI->lwin[WINDOW_CONSOLE].field_buf[0] = 0x00;
+            sUI->lwin[WINDOW_CONSOLE].field_ptr = 0x00;
+            sUI->lwin[WINDOW_CONSOLE].field_length = 0x00;
+            werase(sUI->GetConsole(WINDOW_CONSOLE, 1));
             break;
         case -1:
         case KEY_RESIZE:
@@ -162,20 +169,20 @@ int TheLife::KeyHandle(int key, int keycolor) {
             return -1;
             break;
         default:
-            if (sUI->lwin[WCON].field_length >= FIELDBUFSIZE - 1)
+            if (sUI->lwin[WINDOW_CONSOLE].field_length >= FIELDBUFSIZE - 1)
                 return -1;
 
-            for (i = sUI->lwin[WCON].field_length; i > sUI->lwin[WCON].field_ptr && i > 0; i--)
-                sUI->lwin[WCON].field_buf[i] = sUI->lwin[WCON].field_buf[i - 1];
+            for (i = sUI->lwin[WINDOW_CONSOLE].field_length; i > sUI->lwin[WINDOW_CONSOLE].field_ptr && i > 0; i--)
+                sUI->lwin[WINDOW_CONSOLE].field_buf[i] = sUI->lwin[WINDOW_CONSOLE].field_buf[i - 1];
 
-            sUI->lwin[WCON].field_buf[sUI->lwin[WCON].field_ptr] = key;
-            sUI->lwin[WCON].field_buf[sUI->lwin[WCON].field_length + 1] = 0x00;
-            sUI->lwin[WCON].field_ptr++;
-            sUI->lwin[WCON].field_length++;
+            sUI->lwin[WINDOW_CONSOLE].field_buf[sUI->lwin[WINDOW_CONSOLE].field_ptr] = key;
+            sUI->lwin[WINDOW_CONSOLE].field_buf[sUI->lwin[WINDOW_CONSOLE].field_length + 1] = 0x00;
+            sUI->lwin[WINDOW_CONSOLE].field_ptr++;
+            sUI->lwin[WINDOW_CONSOLE].field_length++;
             break;
         }
-        Interface::ConsoleBuffer(sUI->GetConsole(WCON, 1), sUI->lwin[WCON].field_buf, height, width, sUI->lwin[WCON].field_ptr);
-        wrefresh(sUI->GetConsole(WCON, 1));
+        Interface::ConsoleBuffer(sUI->GetConsole(WINDOW_CONSOLE, 1), sUI->lwin[WINDOW_CONSOLE].field_buf, height, width, sUI->lwin[WINDOW_CONSOLE].field_ptr);
+        wrefresh(sUI->GetConsole(WINDOW_CONSOLE, 1));
         return 0;
 }
 
@@ -201,9 +208,9 @@ void TheLife::Debug(std::string debug, ...) {
     debug = buffer;
 
     if(DEBUG) {
-      wattron(sUI->GetConsole(WCON, 0), COLOR_PAIR(4));
+      wattron(sUI->GetConsole(WINDOW_CONSOLE, 0), COLOR_PAIR(4));
         Interface::ConsoleOutput("Debug[TIME:%s]: %s\n", times.c_str(), debug.c_str());
-      wattroff(sUI->GetConsole(WCON, 0), COLOR_PAIR(4));
+      wattroff(sUI->GetConsole(WINDOW_CONSOLE, 0), COLOR_PAIR(4));
     }
   
     LogHandler::WriteDebug(debug);
@@ -220,9 +227,9 @@ void TheLife::Error(std::string error, ...) {
     error = buffer;
 
     /*
-    wattron(sUI->GetConsole(WCON, 0), COLOR_PAIR(1));
+    wattron(sUI->GetConsole(WINDOW_CONSOLE, 0), COLOR_PAIR(1));
     Interface::ConsoleOutput("Error: %s\n", error.c_str());
-    wattroff(sUI->GetConsole(WCON, 0), COLOR_PAIR(1)); */
+    wattroff(sUI->GetConsole(WINDOW_CONSOLE, 0), COLOR_PAIR(1)); */
 
     LogHandler::WriteError(error);
 }

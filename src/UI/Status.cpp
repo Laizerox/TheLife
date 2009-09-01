@@ -30,23 +30,23 @@ void Interface::StatusInit(std::string text) {
     // Initialization
     getmaxyx( stdscr, y, x );
 
-    sUI->SetY(y, WSTA);
-    sUI->SetX(CONS_WIDTH, WSTA);
-    sUI->SetWindow(newwin( sUI->GetY(WSTA), sUI->GetX(WSTA), 0, x - CONS_WIDTH ), WSTA);
-    sUI->SetStatus(derwin( sUI->GetWindow(WSTA), sUI->GetY(WSTA) - 6 , sUI->GetX(WSTA) - 4, 1, 2 ), WSTA);
-    idlok( sUI->GetStatus(WSTA, 0), TRUE );
-    scrollok( sUI->GetStatus(WSTA, 0), TRUE );
+    sUI->SetY(y, WINDOW_STATUS);
+    sUI->SetX(CONS_WIDTH, WINDOW_STATUS);
+    sUI->SetWindow(newwin( sUI->GetY(WINDOW_STATUS), sUI->GetX(WINDOW_STATUS), 0, x - CONS_WIDTH ), WINDOW_STATUS);
+    sUI->SetStatus(derwin( sUI->GetWindow(WINDOW_STATUS), sUI->GetY(WINDOW_STATUS) - 6 , sUI->GetX(WINDOW_STATUS) - 4, 1, 2 ), WINDOW_STATUS);
+    idlok( sUI->GetStatus(WINDOW_STATUS, 0), TRUE );
+    scrollok( sUI->GetStatus(WINDOW_STATUS, 0), TRUE );
 
     // Draw
-    box( sUI->GetWindow(WSTA), 0, 0 );
+    box( sUI->GetWindow(WINDOW_STATUS), 0, 0 );
     StatusTitle( text );
 }
 
 void Interface::StatusTitle(std::string text) {
 
-    wattron( sUI->GetWindow(WSTA), A_BOLD );
-    mvwaddnstr( sUI->GetWindow(WSTA), 0, 2, text.c_str(), sUI->GetX(WSTA) - 4 );
-    wattroff( sUI->GetWindow(WSTA), A_BOLD );
+    wattron( sUI->GetWindow(WINDOW_STATUS), A_BOLD );
+    mvwaddnstr( sUI->GetWindow(WINDOW_STATUS), 0, 2, text.c_str(), sUI->GetX(WINDOW_STATUS) - 4 );
+    wattroff( sUI->GetWindow(WINDOW_STATUS), A_BOLD );
 }
 
 void Interface::StatusOutput(std::string text, ...) {
@@ -58,16 +58,16 @@ void Interface::StatusOutput(std::string text, ...) {
     vsnprintf(buf, sizeof(buf) - 1, text.c_str(), ap);
     va_end(ap);
 
-    if (CSBUF <= (strlen(sUI->lwin[WSTA].buf) + strlen(buf))) {
-        strncpy(sUI->lwin[WSTA].buf, &sUI->lwin[WSTA].buf[strlen(buf)], CSBUF - 1);
-        sUI->lwin[WSTA].buf[strlen(buf)] = 0x00;
+    if (CSBUF <= (strlen(sUI->lwin[WINDOW_STATUS].buf) + strlen(buf))) {
+        strncpy(sUI->lwin[WINDOW_STATUS].buf, &sUI->lwin[WINDOW_STATUS].buf[strlen(buf)], CSBUF - 1);
+        sUI->lwin[WINDOW_STATUS].buf[strlen(buf)] = 0x00;
     }
-    strncat(sUI->lwin[WSTA].buf, buf, CSBUF - 1 - strlen(buf) - strlen(sUI->lwin[WSTA].buf));
-    waddstr(sUI->GetStatus(WSTA, 0), buf);
+    strncat(sUI->lwin[WINDOW_STATUS].buf, buf, CSBUF - 1 - strlen(buf) - strlen(sUI->lwin[WINDOW_STATUS].buf));
+    waddstr(sUI->GetStatus(WINDOW_STATUS, 0), buf);
 
     if(sUI)
     {
-        wrefresh(sUI->GetStatus(WSTA, 0));
+        wrefresh(sUI->GetStatus(WINDOW_STATUS, 0));
     }
 }
 
@@ -107,7 +107,7 @@ void Interface::UI::StatusUpdate()  {
             default: occ = "None";
         }
 
-        werase(GetStatus(WSTA, 0));
+        werase(GetStatus(WINDOW_STATUS, 0));
 
         if(sTheLife->Active()) {
             

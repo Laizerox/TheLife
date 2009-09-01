@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <cstring>
+#include <iostream>
 
 #include "CommandHandler.h"
 #include "config.h"
@@ -187,8 +188,12 @@ void CommandHandler::hide(std::string arg) {
     int pan;
     std::stringstream argstrm(arg);
 
-    if (!(argstrm>>pan).fail())
-        sUI->HidePanel(pan);
+    if (!(argstrm >> pan).fail()) {
+        Interface::ConsoleOutput("Hide is int with variable: %d\n", pan);
+        sUI->HidePanel((WinCodeID)pan);
+    }
+    
+    refresh();
 }
 
 void CommandHandler::UnitEditName(std::string arg) {
@@ -217,7 +222,7 @@ void CommandHandler::UnitEditSex(std::string arg) {
     std::stringstream argstrm(arg);
 
     if (!(argstrm>>sex).fail())
-        u->SetSex(sex);
+        u->SetSex((SEX)sex);
 }
 void CommandHandler::UnitEditOcc(std::string arg) {
 
@@ -227,7 +232,7 @@ void CommandHandler::UnitEditOcc(std::string arg) {
     std::stringstream argstrm(arg);
 
     if (!(argstrm>>occ).fail())
-        u->SetOcc(occ);
+        u->SetOcc((OCCUPATION)occ);
 }
 
 void CommandHandler::GetConfig(std::string arg) {

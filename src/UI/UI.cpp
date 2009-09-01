@@ -26,14 +26,14 @@ void Interface::Load() {
     ConsoleInit("Console");
     StatusInit("Status");
 
-    sUI->SetPanel(new_panel(sUI->GetWindow(WCON)), WCON); // Console
-    sUI->SetPanel(new_panel(sUI->GetWindow(WSTA)), WSTA); // Status
+    sUI->SetPanel(new_panel(sUI->GetWindow(WINDOW_CONSOLE)), WINDOW_CONSOLE); // Console
+    sUI->SetPanel(new_panel(sUI->GetWindow(WINDOW_STATUS)), WINDOW_STATUS); // Status
 
     // Draw
-    box(sUI->GetWindow(WCON), 0, 0);
+    box(sUI->GetWindow(WINDOW_CONSOLE), 0, 0);
     ConsoleTitle("Console");
 
-    box(sUI->GetWindow(WSTA), 0, 0);
+    box(sUI->GetWindow(WINDOW_STATUS), 0, 0);
     StatusTitle("Status");
 
     update_panels();
@@ -44,9 +44,9 @@ void Interface::Unload()  {
 
     for(int i = 0; i < PANS; ++i) {
         
-        sUI->lwin[i].window.clear();
-        delwin(sUI->GetWindow(i));
-        del_panel(sUI->GetPanel(i));
+        sUI->lwin[(WinCodeID)i].window.clear();
+        delwin(sUI->GetWindow((WinCodeID)i));
+        del_panel(sUI->GetPanel((WinCodeID)i));
     }
     
     refresh();
@@ -62,7 +62,7 @@ void Interface::Resize() {
     Load();
 }
 
-void Interface::UI::HidePanel(int pan) {
+void Interface::UI::HidePanel(WinCodeID pan) {
 
     if(pan > PANS-1) {
         

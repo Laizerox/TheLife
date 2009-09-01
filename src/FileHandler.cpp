@@ -152,10 +152,10 @@ bool FileHandler::LoadPlayer() {
     u->SetAge(tmpInt);
 
     player_ld.read((char *)&tmpInt, 4);
-    u->SetSex(tmpInt);
+    u->SetSex((SEX)tmpInt);
 
     player_ld.read((char *)&tmpInt, 4);
-    u->SetOcc(tmpInt);
+    u->SetOcc((OCCUPATION)tmpInt);
 
     player_ld.close();
     

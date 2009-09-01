@@ -41,20 +41,19 @@ enum Buffers {
     CSBUF         = 2048
 };
 
-enum WinTypeID {
+/* enum WinTypeID {
 
     UINIT   = 0, // uninitialized
     CONSOLE = 1, // normal console
     STATUS  = 2, // status window
     DEBUG   = 3  // debug console
-};
+}; */
 
 enum WinCodeID {
 
-    WCON = 0,
-    WMEN = 0,
-    WSTA = 1,
-    WDEB = 2
+    WINDOW_CONSOLE   = 0,
+    WINDOW_STATUS    = 1,
+    WINDOW_DEBUG     = 2
 };
 
 typedef struct _LIFE_WINDOW {
@@ -69,7 +68,7 @@ typedef struct _LIFE_PANEL {
     bool hidden;
     int x, y;
     WINDOW *win;
-    int type;
+    WinCodeID type;
 } LIFE_PANEL;
 
 typedef struct _LIFE_MENU {
@@ -109,37 +108,37 @@ namespace Interface {
                 LIFE_WINDOW lwin[PANS];
 
                 // Console handler
-                WINDOW *GetConsole(int win, int ex) { return lwin[win].window[ex]; }
-                void SetConsole(WINDOW *cons, int win) { this->lwin[win].window.push_back(cons); }
+                WINDOW *GetConsole(WinCodeID win, int ex) { return lwin[win].window[ex]; }
+                void SetConsole(WINDOW *cons, WinCodeID win) { this->lwin[win].window.push_back(cons); }
                 
                 // Status handler
-                WINDOW *GetStatus(int win, int ex) { return lwin[win].window[ex]; }
-                void SetStatus(WINDOW *stat, int win) { this->lwin[win].window.push_back(stat); }
+                WINDOW *GetStatus(WinCodeID win, int ex) { return lwin[win].window[ex]; }
+                void SetStatus(WINDOW *stat, WinCodeID win) { this->lwin[win].window.push_back(stat); }
                 void StatusUpdate();
 
                 // Windows handling
                 // -- Get functions --
-                int GetY(int pan) { return lpan[pan].y; }
-                int GetX(int pan) { return lpan[pan].x; }
+                int GetY(WinCodeID pan) { return lpan[pan].y; }
+                int GetX(WinCodeID pan) { return lpan[pan].x; }
                 
                 // -- Set functions --
-                void SetY(int y, int pan) { this->lpan[pan].y = y; }
-                void SetX(int x, int pan) { this->lpan[pan].x = x; }
+                void SetY(int y, WinCodeID pan) { this->lpan[pan].y = y; }
+                void SetX(int x, WinCodeID pan) { this->lpan[pan].x = x; }
                 
                 // Panel handling
-                void HidePanel(int pan);
+                void HidePanel(WinCodeID pan);
                 
                 // -- Get functions
-                PANEL *GetPanel(int pan) { return panel[pan]; }
-                bool GetHidden(int pan) { return lpan[pan].hidden; }
-                int GetType(int pan) { return lpan[pan].type; }
-                WINDOW *GetWindow(int pan) { return lpan[pan].win; }
+                PANEL *GetPanel(WinCodeID pan) { return panel[pan]; }
+                bool GetHidden(WinCodeID pan) { return lpan[pan].hidden; }
+                WinCodeID GetType(WinCodeID pan) { return lpan[pan].type; }
+                WINDOW *GetWindow(WinCodeID pan) { return lpan[pan].win; }
                 
                 // -- Set functions --
-                void SetPanel(PANEL *panel, int pan) { this->panel[pan] = panel; }
-                void SetHidden(bool hide, int pan) { this->lpan[pan].hidden = hide; }
-                void SetType(int type, int pan) { this->lpan[pan].type = type; }
-                void SetWindow(WINDOW *win, int pan) { this->lpan[pan].win = win; }
+                void SetPanel(PANEL *panel, WinCodeID pan) { this->panel[pan] = panel; }
+                void SetHidden(bool hide, WinCodeID pan) { this->lpan[pan].hidden = hide; }
+                void SetType(WinCodeID type, WinCodeID pan) { this->lpan[pan].type = type; }
+                void SetWindow(WINDOW *win, WinCodeID pan) { this->lpan[pan].win = win; }
         };
         
         // Menu Section

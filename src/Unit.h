@@ -44,29 +44,29 @@ class Unit {
 
     private:
         std::string name;
-        int sex;
+        SEX sex;
         int age;
-        int occupation;
+        OCCUPATION occupation;
 
     public:
         Unit() {
 
             name = "NONE";
-            sex = 0;
+            sex = NONE;
             age = 0;
-            occupation = 0; }
+            occupation = UNEMPLOYEED; }
 
         // Return functions.
         virtual std::string GetName() { return name; }
-        virtual int GetSex() { return sex; }
+        virtual SEX GetSex() { return sex; }
         virtual int GetAge() { return age; }
-        virtual int GetOcc() { return occupation; }
+        virtual OCCUPATION GetOcc() { return occupation; }
 
         // Set functions.
         virtual void SetName(std::string name) { this->name = name; }
-        virtual void SetSex(int sex) { this->sex = sex; }
+        virtual void SetSex(SEX sex) { this->sex = sex; }
         virtual void SetAge(int age) { this->age = age; }
-        virtual void SetOcc(int occ) { this->occupation = occ; }
+        virtual void SetOcc(OCCUPATION occ) { this->occupation = occ; }
 
 };
 
