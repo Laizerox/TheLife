@@ -58,7 +58,7 @@ void LogHandler::WriteLog(std::string text) {
 
     if(!LOG)
     {
-        NewLog(file, ctime(&rawtime), text, LOGFILE);
+        NewLog(file, ctime(&rawtime), text, LOG_FILE);
         return;
     }
 
@@ -102,7 +102,7 @@ void LogHandler::WriteDebug(std::string text) {
 
     if(!LOG)
     {
-        NewLog(file, ctime(&rawtime), text, DEBUGFILE);
+        NewLog(file, ctime(&rawtime), text, LOG_DEBUG);
         return;
     }
 
@@ -146,7 +146,7 @@ void LogHandler::WriteError(std::string text) {
 
     if(!LOG)
     {
-        NewLog(file, ctime(&rawtime), text, ERRORFILE);
+        NewLog(file, ctime(&rawtime), text, LOG_ERROR);
         return;
     }
 
@@ -156,7 +156,7 @@ void LogHandler::WriteError(std::string text) {
     LOG.close();
 }
 
-void LogHandler::NewLog(std::string file, std::string time, std::string text, int log_type) {
+void LogHandler::NewLog(std::string file, std::string time, std::string text, LOG_TYPE log_type) {
 
     size_t found;
     std::string whitespace("\n");
@@ -178,9 +178,9 @@ void LogHandler::NewLog(std::string file, std::string time, std::string text, in
     
     switch(log_type) {
 
-        case NONE: TheLife::Error(Language::Get(ERROR_LOG_WRONG_TYPE)); break;
-        case LOGFILE: WriteLog(text); break;
-        case DEBUGFILE: WriteDebug(text); break;
-        case ERRORFILE: WriteError(text); break;
+        case LOG_NONE: TheLife::Error(Language::Get(ERROR_LOG_WRONG_TYPE)); break;
+        case LOG_FILE: WriteLog(text); break;
+        case LOG_DEBUG: WriteDebug(text); break;
+        case LOG_ERROR: WriteError(text); break;
     }
 }

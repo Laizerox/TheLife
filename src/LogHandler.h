@@ -21,10 +21,10 @@
 
 enum LOG_TYPE {
 
-    NONE = 0,
-    LOGFILE = 1,
-    DEBUGFILE = 2,
-    ERRORFILE = 3
+    LOG_NONE = 0,
+    LOG_FILE = 1,
+    LOG_DEBUG = 2,
+    LOG_ERROR = 3
 };
 
 namespace LogHandler {
@@ -32,7 +32,7 @@ namespace LogHandler {
     void WriteLog(std::string text);
     void WriteDebug(std::string text);
     void WriteError(std::string text);
-    void NewLog(std::string file, std::string time, std::string text, int log_type);
+    void NewLog(std::string file, std::string time, std::string text, LOG_TYPE log_type);
     
 };
 
