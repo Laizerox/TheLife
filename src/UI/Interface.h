@@ -103,9 +103,12 @@ namespace Interface {
                 LIFE_PANEL lpan[PANS];
 
             public:
-                UI() {}
+                UI() {
+                    m_IsUIInit = false;
+                }
                 
                 LIFE_WINDOW lwin[PANS];
+                bool m_IsUIInit;
 
                 // Console handler
                 WINDOW *GetConsole(WinCodeID win, int ex) { return lwin[win].window[ex]; }

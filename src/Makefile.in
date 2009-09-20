@@ -155,7 +155,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 LDADD = @CURSES_LIBS@
-AM_CFLAGS = -Wall
+AM_CXXLAGS = -Wall -pg
 life_SOURCES = \
 	Main.cpp \
 	Thread.cpp \

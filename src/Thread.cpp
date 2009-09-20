@@ -42,7 +42,7 @@ void *Thread::Run(void *arg) {
         }
     }
     
-    LogHandler::WriteLog(Language::Get(LOG_TH_RUN));
+    LogHandler::WriteLog(sLanguage->Get("LOG_TH_RUN"));
 }
 
 void *Thread::Status(void *arg) {
@@ -63,7 +63,7 @@ void *Thread::Status(void *arg) {
     event.sigev_signo = SIG_STATUS;
     
     if(timer_create(CLOCK_REALTIME, &event, &timer_id) < 0)  {
-        TheLife::Error(Language::Get(ERROR_TH_STATUS_TIMER_CREATE).c_str(), errno);
+        TheLife::Error(sLanguage->Get("ERROR_TH_STATUS_TIMER_CREATE").c_str(), errno);
         return (void *)NULL;
     }
     
@@ -73,9 +73,9 @@ void *Thread::Status(void *arg) {
     itime.it_interval.tv_nsec = 100000000; 
 
     if(timer_settime(timer_id, 0, &itime, NULL) < 0)  {
-        TheLife::Error(Language::Get(ERROR_TH_STATUS_TIMER_SET).c_str(), errno);
+        TheLife::Error(sLanguage->Get("ERROR_TH_STATUS_TIMER_SET").c_str(), errno);
         return (void *)NULL;
     }
     
-    LogHandler::WriteLog(Language::Get(LOG_TH_STATUS));
+    LogHandler::WriteLog(sLanguage->Get("LOG_TH_STATUS"));
 }

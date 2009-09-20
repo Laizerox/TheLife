@@ -34,20 +34,21 @@ namespace TheLife {
         int KeyHandle(int key, int keycolor);
         void Debug(std::string debug, ...);
         void Error(std::string error, ...);
-        std::vector<std::string> Explode(std::string delimiter, std::string str);
-        std::string Implode(std::string limiter, std::vector<std::string> vec);
+        std::vector<std::string> Explode(std::string delimiter, std::string str, int n = 0, std::string filter = "");
+        std::string Implode(std::string limiter, std::vector<std::string> vec, int n = 0);
         void SigHandler(int sig);
         long long millisec_elapsed(struct timespec diff);
         struct timespec diff_timespec(struct timespec start, struct timespec end);
         std::vector<std::string> DirExtension(std::string dir, std::string rexp);
         void CharStr(std::string ch, std::string& str);
-        bool CharCheck(std::string ch, const char *str, int n = 0);
+        bool CharCheck(std::string ch, std::string str, int n = 0);
 
         class Application : public Singleton<Application> {
 
             private:
                 bool quit;
                 bool unload;
+                std::string m_Language;
 
             public:
                 Application() {}
@@ -58,6 +59,9 @@ namespace TheLife {
                 
                 bool Unload() { return unload; }
                 void SetUnload(bool q) { this->unload = q; }
+
+                std::string ActiveLanguage() { return m_Language; }
+                void SetActiveLanguage(std::string lng) { this->m_Language = lng; }
         };
 };
 

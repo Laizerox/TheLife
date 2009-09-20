@@ -178,7 +178,7 @@ void LogHandler::NewLog(std::string file, std::string time, std::string text, LO
     
     switch(log_type) {
 
-        case LOG_NONE: TheLife::Error(Language::Get(ERROR_LOG_WRONG_TYPE)); break;
+        case LOG_NONE: TheLife::Error(sLanguage->Get("ERROR_LOG_WRONG_TYPE")); break;
         case LOG_FILE: WriteLog(text); break;
         case LOG_DEBUG: WriteDebug(text); break;
         case LOG_ERROR: WriteError(text); break;

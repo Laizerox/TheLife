@@ -106,7 +106,7 @@ void const CommandHandler::LookupCommand(CommandTable *table, std::string cmd)  
             if(table[i].SubCMD != NULL && !strcmp(table[i].name,lines[0].c_str()))
             {
                 LookupCommand(table[i].SubCMD, arg);
-                TheLife::Debug(Language::Get(DEBUG_LOOKUP_LOOP).c_str(), table, i);
+                TheLife::Debug(sLanguage->Get("DEBUG_LOOKUP_LOOP").c_str(), table, i);
                 return;
             }
             
@@ -123,7 +123,7 @@ void const CommandHandler::LookupCommand(CommandTable *table, std::string cmd)  
 
     // If not found report that it was not found and what we typed
     if(!found)
-        TheLife::Error(Language::Get(ERROR_WRONG_CMD).c_str(), lines[0].c_str());
+        TheLife::Error(sLanguage->Get("ERROR_WRONG_CMD").c_str(), lines[0].c_str());
 } 
 
 void CommandHandler::help(std::string arg) {
@@ -139,7 +139,7 @@ void CommandHandler::exit(std::string arg) {
 
     sTheLife->SetActive(FALSE);
     sTheLife->SetUnload(TRUE);
-    TheLife::Debug(Language::Get(DEBUG_CALL_EXIT).c_str());
+    TheLife::Debug(sLanguage->Get("DEBUG_CALL_EXIT").c_str());
 }
 
 void CommandHandler::about(std::string arg) {
@@ -159,26 +159,26 @@ void CommandHandler::about(std::string arg) {
 void CommandHandler::threads(std::string arg) {
 
     for(int i = 0; i < sThread->ListThread(); ++i)
-        Interface::ConsoleOutput(Language::Get(CMD_TH_POINTER).c_str(), i, sThread->GetThread(i));
+        Interface::ConsoleOutput(sLanguage->Get("CMD_TH_POINTER").c_str(), i, sThread->GetThread(i));
 }
 
 void CommandHandler::ConfigList(std::string arg) {
 
     for(int i = 0; i < sConfig->GetDataSize(); ++i) {
-        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), sConfig->GetData(i).c_str());
+        Interface::ConsoleOutput(sLanguage->Get("CMD_CONFIG_LIST").c_str(), sConfig->GetData(i).c_str());
         for(int j = 1; j < sConfig->GetDataSize(i); ++j) {
-            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(), sConfig->GetData(i,j).c_str(), i, j, (j == sConfig->GetDataSize(i)-1) ? "\n\n" : "\n");
+            Interface::ConsoleOutput(sLanguage->Get("CMD_CONFIG_LIST_ITEM").c_str(), sConfig->GetData(i,j).c_str(), i, j, (j == sConfig->GetDataSize(i)-1) ? "\n\n" : "\n");
         }
     }
 }
 
 void CommandHandler::LanguageList(std::string arg) {
 
-    Interface::ConsoleOutput("HeaderDataSize() is %d\n", sLangHeader->HeaderDataSize());
-    for(int i = 0; i < sLangHeader->HeaderDataSize(); ++i) {
-        Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST).c_str(), sLangHeader->ReturnHeader(i).c_str());
-        for(int j = 1; j < sLangHeader->HeaderDataSize(i); ++j) {
-            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_LIST_ITEM).c_str(), sLangHeader->ReturnHeader(i,j).c_str(), i, j, (j == sLangHeader->HeaderDataSize(i)-1) ? "\n\n" : "\n");
+    Interface::ConsoleOutput("HeaderDataSize() is %d\n", sLanguage->HeaderDataSize());
+    for(int i = 0; i < sLanguage->HeaderDataSize(); ++i) {
+        Interface::ConsoleOutput(sLanguage->Get("CMD_CONFIG_LIST").c_str(), sLanguage->ReturnHeader(i).c_str());
+        for(int j = 1; j < sLanguage->HeaderDataSize(i); ++j) {
+            Interface::ConsoleOutput(sLanguage->Get("CMD_CONFIG_LIST_ITEM").c_str(), sLanguage->ReturnHeader(i,j).c_str(), i, j, (j == sLanguage->HeaderDataSize(i)-1) ? "\n\n" : "\n");
         }
     }
 }
@@ -239,10 +239,10 @@ void CommandHandler::GetConfig(std::string arg) {
 
     if(!sConfig->GetVariable(arg).empty()) {
         for(int i = 1; i < sConfig->GetDataSize(sConfig->GetLine(arg)); ++i)
-            Interface::ConsoleOutput(Language::Get(CMD_CONFIG_GET).c_str(), arg.c_str(), i, sConfig->GetVariable(arg,i).c_str());
+            Interface::ConsoleOutput(sLanguage->Get("CMD_CONFIG_GET").c_str(), arg.c_str(), i, sConfig->GetVariable(arg,i).c_str());
     }
     else
-        TheLife::Error(Language::Get(ERROR_WRONG_CMD_CONFIG).c_str(), arg.c_str());
+        TheLife::Error(sLanguage->Get("ERROR_WRONG_CMD_CONFIG").c_str(), arg.c_str());
 }
 
 void CommandHandler::ConfigAddConfig(std::string var) {
@@ -293,6 +293,6 @@ void const CommandHandler::CommandProcess(char *buffer)  {
     }
     else
     {
-        Interface::ConsoleOutput(Language::Get(CMD_PROCESS).c_str());
+        Interface::ConsoleOutput(sLanguage->Get("CMD_PROCESS").c_str());
     }
 }

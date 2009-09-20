@@ -27,29 +27,29 @@ void Interface::LoadMenu()
 {
     int y, x, c;
 
-    sTheLife->SetActive(FALSE);
-    sTheLife->SetUnload(FALSE);
-    sMenu->SetActive(TRUE);
+    sTheLife->SetActive(false);
+    sTheLife->SetUnload(false);
+    sMenu->SetActive(true);
     
     /* Initialize curses */
     initscr();
     start_color();
     use_default_colors();
     noecho();
-    keypad( stdscr, TRUE );
+    keypad(stdscr, true);
     
     // Initialization
     getmaxyx( stdscr, y, x );
 
     sMenu->SetY(y - MENU_HEIGHT);
     sMenu->SetX(x - MENU_WIDTH);
-    sMenu->SetWindow(newwin( 15, 30, (int)(sMenu->GetY() * 0.5), (int)(sMenu->GetX() * 0.5)));
+    sMenu->SetWindow(newwin(15, 30, (int)(sMenu->GetY() * 0.5), (int)(sMenu->GetX() * 0.5)));
         
     // Create items
     sMenu->ch = (ITEM **) calloc(4, sizeof(ITEM *));
-    sMenu->ch[0] = new_item(Language::Get(MSG_MENU_OPT_START).c_str(), "");
-    sMenu->ch[1] = new_item(Language::Get(MSG_MENU_OPT_OPTIONS).c_str(), "");
-    sMenu->ch[2] = new_item(Language::Get(MSG_MENU_OPT_EXIT).c_str(), "");
+    sMenu->ch[0] = new_item(sLanguage->Get("MSG_MENU_OPT_START").c_str(), "");
+    sMenu->ch[1] = new_item(sLanguage->Get("MSG_MENU_OPT_OPTIONS").c_str(), "");
+    sMenu->ch[2] = new_item(sLanguage->Get("MSG_MENU_OPT_EXIT").c_str(), "");
     
     set_item_userptr(sMenu->ch[0], (void *) &Interface::MenuLife);
     set_item_userptr(sMenu->ch[2], (void *) &Interface::MenuQuit);   
@@ -57,7 +57,7 @@ void Interface::LoadMenu()
     // Create menu
     sMenu->SetMenu(new_menu((ITEM **)sMenu->ch));
 
-    keypad(sMenu->GetWindow(), TRUE);
+    keypad(sMenu->GetWindow(), true);
      
     // Misc
     getmaxyx( sMenu->GetWindow(), y, x );
@@ -67,8 +67,8 @@ void Interface::LoadMenu()
     set_menu_sub(sMenu->GetMenu(), derwin(sMenu->GetWindow(), 0, 0, 5, (int)(y * 0.5) + 2));
     set_menu_mark(sMenu->GetMenu(), " * ");
 
-    mvprintw(LINES - 2, 0, Language::Get(MSG_MENU_USE).c_str());
-    mvprintw(LINES - 1, 0, "%s %s - %s / Compiled with: %s (%s)", Language::Get(NAME_THELIFE).c_str(), config::getInstance()->GetVariable("version").c_str(), Language::Get(MSG_MENU_DEVEL).c_str(), __VERSION__, __DATE__);
+    mvprintw(LINES - 2, 0, sLanguage->Get("MSG_MENU_USE").c_str());
+    mvprintw(LINES - 1, 0, "%s %s - %s / Compiled with: %s (%s)", sLanguage->Get("NAME_THELIFE").c_str(), config::getInstance()->GetVariable("version").c_str(), sLanguage->Get("MSG_MENU_DEVEL").c_str(), __VERSION__, __DATE__);
     
     box(sMenu->GetWindow(), 0, 0);
     mvwhline( sMenu->GetWindow(), 2, 1, 0, x-2);
@@ -123,11 +123,11 @@ void Interface::LoadMenu()
 
 void Interface::MenuQuit() {
     
-    sMenu->SetActive(FALSE);
+    sMenu->SetActive(false);
 }
 
 void Interface::MenuLife() {
     
-    sTheLife->SetActive(TRUE);
-    sMenu->SetActive(FALSE);
+    sTheLife->SetActive(true);
+    sMenu->SetActive(false);
 }

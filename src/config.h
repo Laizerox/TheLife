@@ -41,8 +41,7 @@ class config : public Singleton <config>
         virtual int GetLine(std::string look);
 
         // Conf loading&saving
-        void LoadConf(std::string file, config *conf);
-        void CreateDefaultConfig(std::string file, config *conf);
+        void LoadConf(std::string file);
         void EditConfig(std::string file, std::string name);
         bool WriteToConfig(std::string file, std::string variable);
 };

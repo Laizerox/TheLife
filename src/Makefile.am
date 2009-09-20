@@ -1,5 +1,5 @@
 LDADD= @CURSES_LIBS@
-AM_CFLAGS=-Wall
+AM_CXXLAGS=-Wall -pg
 bin_PROGRAMS=life
 life_SOURCES= \
 	Main.cpp \

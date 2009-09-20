@@ -132,13 +132,13 @@ bool FileHandler::LoadPlayer() {
 
     if(!CheckLDH(sFileHandler->loaded_ldh)) {
 
-        TheLife::Error(Language::Get(ERROR_PLAYER_WRONG_DHEAD).c_str(), sFileHandler->loaded_ldh);
+        TheLife::Error(sLanguage->Get("ERROR_PLAYER_WRONG_DHEAD").c_str(), sFileHandler->loaded_ldh);
         return false;
     }
 
     if(!CheckLDV(sFileHandler->loaded_ldv)) {
 
-        TheLife::Error(Language::Get(ERROR_PLAYER_WRONG_DVER).c_str(), sFileHandler->loaded_ldv);
+        TheLife::Error(sLanguage->Get("ERROR_PLAYER_WRONG_DVER").c_str(), sFileHandler->loaded_ldv);
         return false;
     }
 

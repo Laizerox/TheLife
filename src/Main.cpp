@@ -16,17 +16,20 @@
  * 
  */
 
+#include <iostream>
+
 #include "config.h"
 #include "Language.h"
 #include "UI/App.h"
 #include "UI/Interface.h"
 
 int main() {
-       
+
     //Language::Load("finnish.lng");
-    sLangHeader->LoadHeader();    
+    sLanguage->LoadHeader();
+    sTheLife->SetActiveLanguage("Russian");
     
-    sConfig->LoadConf("data/life.config", sConfig);
+    sConfig->LoadConf("data/life.config");
     
     Interface::LoadMenu();
     

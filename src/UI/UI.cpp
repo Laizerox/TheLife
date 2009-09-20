@@ -38,6 +38,7 @@ void Interface::Load() {
 
     update_panels();
     doupdate();
+    sUI->m_IsUIInit = true;
 }
 
 void Interface::Unload()  {
@@ -66,7 +67,7 @@ void Interface::UI::HidePanel(WinCodeID pan) {
 
     if(pan > PANS-1) {
         
-        TheLife::Error(Language::Get(ERROR_HIDE_PANEL).c_str(), pan, PANS-2, PANS-1);
+        TheLife::Error(sLanguage->Get("ERROR_HIDE_PANEL").c_str(), pan, PANS-2, PANS-1);
         return;
     }
     
